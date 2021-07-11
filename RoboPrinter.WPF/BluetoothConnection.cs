@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
@@ -14,39 +15,35 @@ namespace RoboPrinter.WPF
 		private StreamSocket _socket;
 
 		public async void Initialize()
-		{				
+		{
 			// Enumerate devices with the object push service
 			DeviceInformationCollection services = await DeviceInformation
-				.FindAllAsync(RfcommDeviceService.GetDeviceSelector(RfcommServiceId.ObexObjectPush));
+				.FindAllAsync(RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort));
 
 			if (services.Count > 0)
 			{
 				// Initialize the target Bluetooth BR device
 				RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(services[0].Id);
 
-				bool isCompatibleVersion = await IsCompatibleVersionAsync(service);
+				bool isCompatibleVersion = true; //await IsCompatibleVersionAsync(service);
 
 				// Check that the service meets this App's minimum requirement
 				if (SupportsProtection(service) && isCompatibleVersion)
 				{
 					_service = service;
-
-					// Create a socket and connect to the target
 					_socket = new StreamSocket();
+
 					await _socket.ConnectAsync(
 						_service.ConnectionHostName,
-						_service.ConnectionServiceName,
-						SocketProtectionLevel
-							.BluetoothEncryptionAllowNullAuthentication);
+						_service.ConnectionServiceName, 
+						SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
+					);
+					
+					var stream = _socket.OutputStream.AsStreamForWrite();
 
-
-
-					// The socket is connected. At this point the App can wait for
-					// the user to take some action, for example, click a button to send a
-					// file to the device, which could invoke the Picker and then
-					// send the picked file. The transfer itself would use the
-					// Sockets API and not the Rfcomm API, and so is omitted here for
-					// brevity.
+					StreamWriter writer = new StreamWriter(stream);
+					await writer.WriteLineAsync("500");
+					await writer.FlushAsync();
 				}
 			}
 		}
@@ -81,31 +78,6 @@ namespace RoboPrinter.WPF
 					break;
 			}
 			return false;
-		}
-
-		// This App relies on CRC32 checking available in version 2.0 of the service.
-		private const uint SERVICE_VERSION_ATTRIBUTE_ID = 0x0300;
-		private const byte SERVICE_VERSION_ATTRIBUTE_TYPE = 0x0A;   // UINT32
-		private const uint MINIMUM_SERVICE_VERSION = 200;
-		public static async Task<bool> IsCompatibleVersionAsync(RfcommDeviceService service)
-		{
-			System.Collections.Generic.IReadOnlyDictionary<uint, IBuffer> attributes = 
-				await service.GetSdpRawAttributesAsync(BluetoothCacheMode.Uncached);
-			var attribute = attributes[SERVICE_VERSION_ATTRIBUTE_ID];
-			DataReader reader = DataReader.FromBuffer(attribute);
-
-			// The first byte contains the attribute's type
-			byte attributeType = reader.ReadByte();
-			if (attributeType == SERVICE_VERSION_ATTRIBUTE_TYPE)
-			{
-				// The remainder is the data
-				uint version = reader.ReadUInt32();
-				return version >= MINIMUM_SERVICE_VERSION;
-			}
-			else
-			{
-				return false;
-			}
 		}
 	}
 }
