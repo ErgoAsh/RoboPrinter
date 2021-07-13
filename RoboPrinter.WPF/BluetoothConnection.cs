@@ -13,6 +13,7 @@ namespace RoboPrinter.WPF
 	{
 		private RfcommDeviceService _service;
 		private StreamSocket _socket;
+		private DataWriter _writer;
 
 		public async void Initialize()
 		{
@@ -25,10 +26,8 @@ namespace RoboPrinter.WPF
 				// Initialize the target Bluetooth BR device
 				RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(services[0].Id);
 
-				bool isCompatibleVersion = true; //await IsCompatibleVersionAsync(service);
-
 				// Check that the service meets this App's minimum requirement
-				if (SupportsProtection(service) && isCompatibleVersion)
+				if (SupportsProtection(service))
 				{
 					_service = service;
 					_socket = new StreamSocket();
@@ -38,12 +37,11 @@ namespace RoboPrinter.WPF
 						_service.ConnectionServiceName, 
 						SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
 					);
-					
-					var stream = _socket.OutputStream.AsStreamForWrite();
 
-					StreamWriter writer = new StreamWriter(stream);
-					await writer.WriteLineAsync("500");
-					await writer.FlushAsync();
+					_writer = new DataWriter(_socket.OutputStream);
+
+					_writer.WriteInt32(500);
+					await _writer.StoreAsync();
 				}
 			}
 		}
