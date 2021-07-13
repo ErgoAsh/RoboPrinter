@@ -40,8 +40,10 @@ namespace RoboPrinter.WPF
 
 					_writer = new DataWriter(_socket.OutputStream);
 
-					_writer.WriteInt32(500);
+					_writer.WriteString("ABC\n");
+
 					await _writer.StoreAsync();
+					await _writer.FlushAsync();
 				}
 			}
 		}

@@ -48,12 +48,13 @@ void loop()
   if (Serial1.available() > 0)
   {
     char character = Serial1.read();
+    Serial.print(String(character));
+    Serial.print(" ");
+    Serial.println(character);
 
     if ((character == '\n' || character == '\r') && bluetoothResponse != "")
     {
-      char output[32];
-      sprintf(output, "OK: %s", bluetoothResponse);
-      Serial.println(output);
+      Serial.print(bluetoothResponse);
 
       //pwm.setPWM(servonum, 0, map(sensorValue, 0, 1023, SERVOMIN, SERVOMAX));
 
