@@ -9,7 +9,7 @@ using Windows.Storage.Streams;
 
 namespace RoboPrinter.WPF
 {
-	public class BluetoothConnection
+	public class BluetoothService
 	{
 		private RfcommDeviceService _service;
 		private StreamSocket _socket;
@@ -40,7 +40,7 @@ namespace RoboPrinter.WPF
 
 					_writer = new DataWriter(_socket.OutputStream);
 
-					_writer.WriteString("ABC\n");
+					_writer.WriteString("A120\n"); //Move servo 0 to 120 deg position.
 
 					await _writer.StoreAsync();
 					await _writer.FlushAsync();

@@ -1,69 +1,56 @@
-#include <stdio.h>
 #include <Wire.h>
-#include <Adafruit_PWMServoDriver.h>
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+#include "servo_control.h"
 
-#define SERVOMIN 150  // This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX 600  // This is the 'maximum' pulse length count (out of 4096)
-#define USMIN 600     // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
-#define USMAX 2400    // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
-#define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
+void processIncomingByte(const byte input_byte);
 
-uint8_t servonum = 0;
+namespace constants {
 
-uint8_t character_counter = 0;
-String bluetoothResponse = "";
+// Maximum length of input of Bluetooth transmission
+static const unsigned int bluetooth_max_input = 16;
 
-void setup()
-{
-  Serial.begin(9600);
-  Serial1.begin(9600);
+}  // namespace constants
 
-  pwm.begin();
-  /*
-   * In theory the internal oscillator (clock) is 25MHz but it really isn't
-   * that precise. You can 'calibrate' this by tweaking this number until
-   * you get the PWM update frequency you're expecting!
-   * The int.osc. for the PCA9685 chip is a range between about 23-27MHz and
-   * is used for calculating things like writeMicroseconds()
-   * Analog servos run at ~50 Hz updates, It is important to use an
-   * oscilloscope in setting the int.osc frequency for the I2C PCA9685 chip.
-   * 1) Attach the oscilloscope to one of the PWM signal pins and ground on
-   *    the I2C PCA9685 chip you are setting the value for.
-   * 2) Adjust setOscillatorFrequency() until the PWM update frequency is the
-   *    expected value (50Hz for most ESC-s)
-   * Setting the value here is specific to each individual I2C PCA9685 chip and
-   * affects the calculations for the PWM update frequency. 
-   * Failure to correctly set the int.osc value will cause unexpected PWM results
-   */
-  pwm.setOscillatorFrequency(27000000);
-  pwm.setPWMFreq(SERVO_FREQ); // Analog servos run at ~50 Hz updates
+static auto servo = ServoControl();
 
-  delay(10);
+void setup() {
+    Serial.begin(9600);   // Serial monitor for USB debugging
+    Serial1.begin(9600);  // Arduino Nano Every UART
+
+    servo.initialize();
+
+    delay(10);
 }
 
-void loop()
-{
-  if (Serial1.available() > 0)
-  {
-    char character = Serial1.read();
-    Serial.print(String(character));
-    Serial.print(" ");
-    Serial.println(character);
-
-    if ((character == '\n' || character == '\r') && bluetoothResponse != "")
-    {
-      Serial.print(bluetoothResponse);
-
-      //pwm.setPWM(servonum, 0, map(sensorValue, 0, 1023, SERVOMIN, SERVOMAX));
-
-      character_counter = 0;
-      bluetoothResponse = "";
+void loop() {
+    if (Serial1.available() > 0) {
+        processIncomingByte(Serial1.read());
     }
-    else
-    {
-      bluetoothResponse += character;
+}
+
+void processIncomingByte(const byte input_byte) {
+    static char input_line[constants::bluetooth_max_input];
+    static unsigned int input_position = 0;
+
+    switch (input_byte) {
+        case '\n':                           // end of text
+            input_line[input_position] = 0;  // terminating null byte
+
+            // terminator reached process input_line here
+            servo.process_serial_data(input_line, input_position + 1);
+
+            // reset buffer for next time
+            input_position = 0;
+            break;
+
+        case '\r':  // discard carriage return
+            break;
+
+        default:
+            // keep adding if not full; allow for terminating null byte
+            if (input_position < (constants::bluetooth_max_input - 1)) {
+                input_line[input_position++] = input_byte;
+            }
+            break;
     }
-  }
 }
