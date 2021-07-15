@@ -3,11 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RoboPrinter.WPF"
-        mc:Ignorable="d"
+        xmlns:controls="clr-namespace:RoboPrinter.WPF.Controls"
+        xmlns:local="clr-namespace:RoboPrinter.WPF" 
+		mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-		<Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="413,180,0,0" VerticalAlignment="Top" Click="button_Click"/>
-
+		<TabControl x:Name="tabControl">
+			<TabItem Header="Bluetooth settings">
+				<controls:BluetoothControl/>
+			</TabItem>
+			<TabItem Header="Servo callibration">
+				<controls:CallibrationControl/>
+			</TabItem>
+			<TabItem Header="Servo control">
+				<controls:CommandControl/>
+			</TabItem>
+		</TabControl>
 	</Grid>
 </Window>

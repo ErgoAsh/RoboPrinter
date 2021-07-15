@@ -11,11 +11,5 @@ namespace RoboPrinter.WPF
 		{
 			InitializeComponent();
 		}
-
-		private void button_Click(object sender, RoutedEventArgs e)
-		{
-			var bluetooth = new BluetoothService();
-			bluetooth.Initialize();
-		}
 	}
 }
