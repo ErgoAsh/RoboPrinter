@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RoboPrinter.Core
 {
@@ -11,7 +12,7 @@ namespace RoboPrinter.Core
 
 	public interface IBluetoothService
 	{
-		public void Connect(BluetoothDevice device);
+		public Task<Task> Connect(BluetoothDevice device);
 		public void Disconnect();
 		public void RefreshDeviceList();
 

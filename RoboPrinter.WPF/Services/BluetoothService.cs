@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Foundation;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 
@@ -28,7 +29,7 @@ namespace RoboPrinter.WPF
 			//DeviceWatcher aa = new DeviceWatcher();
 		}
 
-		public async void Connect(BluetoothDevice device)
+		public async Task<Task> Connect(BluetoothDevice device)
 		{
 			// Initialize the target Bluetooth BR device
 			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(device.Id);
@@ -39,14 +40,15 @@ namespace RoboPrinter.WPF
 				_service = service;
 				_socket = new StreamSocket();
 
-				await _socket.ConnectAsync(
+				return _socket.ConnectAsync(
 					_service.ConnectionHostName,
 					_service.ConnectionServiceName,
 					SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
-				);
+				).AsTask();
 
-				_writer = new DataWriter(_socket.OutputStream);
+				
 			}
+			return null;
 		}
 
 		public void Disconnect()
@@ -82,14 +84,18 @@ namespace RoboPrinter.WPF
 				RefreshDeviceList();
 				var service = GetAvilableBluetoothDevices().GetEnumerator().Current;
 				if (service != null)
-					Connect(service);
+					await Connect(service);
 				else
 				{
 					var enumerator = GetAvilableBluetoothDevices().GetEnumerator();
 					enumerator.MoveNext();
 					service = enumerator.Current;
 					if (service != null)
-						Connect(service);
+					{
+						(await Connect(service)).Wait();
+						_writer = new DataWriter(_socket.OutputStream);
+					}
+						
 				}
 			}
 
