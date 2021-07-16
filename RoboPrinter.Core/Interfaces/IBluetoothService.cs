@@ -1,29 +1,24 @@
-﻿using System;
+﻿using RoboPrinter.Core.Models;
+using System;
 using System.Collections.Generic;
 
-namespace RoboPrinter.Core
+namespace RoboPrinter.Core.Interfaces
 {
-	public class PositionEventArgs
-	{
-		public short ServoID { get; set; }
-		public float Position { get; set; }
-	}
-
 	public interface IBluetoothService
 	{
 		public void Connect(BluetoothDevice device);
 		public void Disconnect();
 		public void RefreshDeviceList();
 
-		public void SendPosition(short servoID, float position);
+		public void SendPosition(short servoId, float position);
 		//public void ReceiveFeedbackLoop(data reader)
 
-		public IEnumerable<BluetoothDevice> GetAvilableBluetoothDevices();
+		public IEnumerable<BluetoothDevice> GetAvailableBluetoothDevices();
 
-		protected void OnPositionSentEvent(PositionEventArgs e);
-		protected void OnFeedbackReciviedEvent(PositionEventArgs e);
+		void OnPositionSentEvent(PositionEventArgs e);
+		void OnFeedbackReceivedEvent(PositionEventArgs e);
 
 		public event EventHandler<PositionEventArgs> PositionSent;
-		public event EventHandler<PositionEventArgs> FeedbackRecivied;
+		public event EventHandler<PositionEventArgs> FeedbackReceived;
 	}
 }

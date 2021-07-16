@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="RoboPrinter.Avalonia/App.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/BluetoothControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/CalibrationControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/MainWindow.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/ServoTestControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.WPF/Controls/CommandControl.xaml" value="RoboPrinter.WPF/RoboPrinter.WPF.csproj" />
+        <entry key="RoboPrinter.WPF/MainWindow.xaml" value="RoboPrinter.WPF/RoboPrinter.WPF.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

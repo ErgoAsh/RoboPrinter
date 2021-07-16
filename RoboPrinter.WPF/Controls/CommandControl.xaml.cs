@@ -7,13 +7,13 @@ namespace RoboPrinter.WPF.Controls
 	/// <summary>
 	/// Interaction logic for CommandControl.xaml
 	/// </summary>
-	public partial class CommandControl : ReactiveUserControl<ServoCommandViewModel>
+	public partial class CommandControl : ReactiveUserControl<ServoTestViewModel>
 	{
 		public CommandControl()
 		{
 			InitializeComponent();
 
-			ViewModel = new ServoCommandViewModel();
+			ViewModel = new ServoTestViewModel();
 
 			this.WhenActivated((dispose) =>
 			{

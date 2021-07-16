@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoboPrinter.WPF", "RoboPrinter.WPF\RoboPrinter.WPF.csproj", "{4BBFCB4F-C0AE-4989-B27B-311D87A4332B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoboPrinter.WPF.Tests", "RoboPrinter.Tests\RoboPrinter.WPF.Tests.csproj", "{444F1595-DC60-43B4-8873-255B1151FE3D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoboPrinter.Core", "RoboPrinter.Core\RoboPrinter.Core.csproj", "{2AC32D0C-1D93-492A-984D-B7BC41D125C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5FF9D8BE-9764-4FFE-827C-F19D468131A5}"
@@ -16,32 +12,43 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{B0471D43-90F6-4F16-9575-47E369485DFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboPrinter.Avalonia", "RoboPrinter.Avalonia\RoboPrinter.Avalonia.csproj", "{37BDAC95-19E1-438C-B143-A8007B6CF512}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboPrinter.Core.Tests", "RoboPrinter.Core.Tests\RoboPrinter.Core.Tests.csproj", "{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboPrinter.Avalonia.Tests", "RoboPrinter.Avalonia.Tests\RoboPrinter.Avalonia.Tests.csproj", "{7AA2FC71-6497-40BA-B8C5-333543BB25B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4BBFCB4F-C0AE-4989-B27B-311D87A4332B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4BBFCB4F-C0AE-4989-B27B-311D87A4332B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4BBFCB4F-C0AE-4989-B27B-311D87A4332B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4BBFCB4F-C0AE-4989-B27B-311D87A4332B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{444F1595-DC60-43B4-8873-255B1151FE3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{444F1595-DC60-43B4-8873-255B1151FE3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{444F1595-DC60-43B4-8873-255B1151FE3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{444F1595-DC60-43B4-8873-255B1151FE3D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2AC32D0C-1D93-492A-984D-B7BC41D125C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2AC32D0C-1D93-492A-984D-B7BC41D125C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AC32D0C-1D93-492A-984D-B7BC41D125C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AC32D0C-1D93-492A-984D-B7BC41D125C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37BDAC95-19E1-438C-B143-A8007B6CF512}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37BDAC95-19E1-438C-B143-A8007B6CF512}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37BDAC95-19E1-438C-B143-A8007B6CF512}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37BDAC95-19E1-438C-B143-A8007B6CF512}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AA2FC71-6497-40BA-B8C5-333543BB25B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AA2FC71-6497-40BA-B8C5-333543BB25B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AA2FC71-6497-40BA-B8C5-333543BB25B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AA2FC71-6497-40BA-B8C5-333543BB25B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{4BBFCB4F-C0AE-4989-B27B-311D87A4332B} = {B0471D43-90F6-4F16-9575-47E369485DFA}
-		{444F1595-DC60-43B4-8873-255B1151FE3D} = {B0471D43-90F6-4F16-9575-47E369485DFA}
 		{2AC32D0C-1D93-492A-984D-B7BC41D125C7} = {B0471D43-90F6-4F16-9575-47E369485DFA}
+		{37BDAC95-19E1-438C-B143-A8007B6CF512} = {B0471D43-90F6-4F16-9575-47E369485DFA}
+		{EAD859A4-B36E-4E6B-B1C0-6A6F69595AF3} = {B0471D43-90F6-4F16-9575-47E369485DFA}
+		{7AA2FC71-6497-40BA-B8C5-333543BB25B3} = {B0471D43-90F6-4F16-9575-47E369485DFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39BF526A-90C1-4BE9-B92B-34EC25CE136F}
