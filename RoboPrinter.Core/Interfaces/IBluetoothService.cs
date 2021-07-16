@@ -1,12 +1,13 @@
 ﻿using RoboPrinter.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RoboPrinter.Core.Interfaces
 {
 	public interface IBluetoothService
 	{
-		public void Connect(BluetoothDevice device);
+		public Task<Task> Connect(BluetoothDevice device);
 		public void Disconnect();
 		public void RefreshDeviceList();
 

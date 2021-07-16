@@ -22,7 +22,7 @@ namespace RoboPrinter.WPF.Controls
 					view => view.UpdateButton,
 					viewModel => viewModel.Position);
 
-				this.OneWayBind(ViewModel,
+				this.Bind(ViewModel,
 					viewModel => viewModel.Position,
 					view => view.ServoSlider1.Value);
 			});
