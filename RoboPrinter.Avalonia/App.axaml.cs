@@ -1,7 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using RoboPrinter.Avalonia.Services;
 using RoboPrinter.Avalonia.Views;
+using RoboPrinter.Core.Interfaces;
+using Splat;
 
 namespace RoboPrinter.Avalonia
 {
@@ -10,6 +13,8 @@ namespace RoboPrinter.Avalonia
 		public override void Initialize()
 		{
 			AvaloniaXamlLoader.Load(this);
+			
+			Locator.CurrentMutable.Register(() => new BluetoothService(), typeof(IBluetoothService));
 		}
 
 		public override void OnFrameworkInitializationCompleted()
