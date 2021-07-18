@@ -1,8 +1,24 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="RoboPrinter.Avalonia.Views.BluetoothControl">
-    Welcome to Avalonia!
-</UserControl>
+﻿<reactiveUi:ReactiveUserControl xmlns="https://github.com/avaloniaui"
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                xmlns:reactiveUi="http://reactiveui.net"
+                                xmlns:viewModels="clr-namespace:RoboPrinter.Core.ViewModels;assembly=RoboPrinter.Core"
+                                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                                x:TypeArguments="viewModels:BluetoothViewModel" 
+                                x:Class="RoboPrinter.Avalonia.Views.BluetoothControl">
+    
+    <StackPanel>
+        <DataGrid Name="ConnectionDataGrid" IsReadOnly="True" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" /> 
+                <DataGridCheckBoxColumn Header="Connected" Binding="{Binding IsConnected}" /> 
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Orientation="Horizontal">
+            <Button Name="TestConnectionButton">Test connection</Button>
+            <Button Name="ConnectButton">Connect</Button>
+        </StackPanel>
+    </StackPanel> 
+</reactiveUi:ReactiveUserControl>
