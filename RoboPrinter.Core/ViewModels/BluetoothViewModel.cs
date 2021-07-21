@@ -31,14 +31,16 @@ namespace RoboPrinter.Core.ViewModels
 					.GetBluetoothDevicesObservable()
 					.AsObservable()
 					.Bind(Items)
-					.Do(_ =>
-					{
-						Console.WriteLine("Aa");
-					})
 					.Subscribe()
 					.DisposeWith(disposable);
 
-				Items.Add(new[] {new BluetoothDevice {Id = "aa", Name = "bb", IsConnected = false}});
+				this.WhenAnyValue(vm => vm.SelectedItem)
+					.Where(item => item != null)
+					.Subscribe(item =>
+					{
+						Console.WriteLine(item.Id);
+					})
+					.DisposeWith(disposable);
 			});
 			//
 			// IObservableCache<BluetoothDevice, string> changeSet = Items
