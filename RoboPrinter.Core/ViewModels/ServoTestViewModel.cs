@@ -8,13 +8,6 @@ namespace RoboPrinter.Core.ViewModels
 {
 	public class ServoTestViewModel : ReactiveObject
 	{
-		private IBluetoothService BluetoothService { get; set; }
-
-		//public SourceCache<float, short> ServoPositions { get; set; }
-		[Reactive] public float Position { get; set; }
-
-		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
-
 		public ServoTestViewModel(IBluetoothService bluetoothService = null)
 		{
 			BluetoothService = bluetoothService ?? Locator.Current.GetService<IBluetoothService>();
@@ -27,5 +20,13 @@ namespace RoboPrinter.Core.ViewModels
 				BluetoothService.SendPosition(0, Position);
 			});
 		}
+
+		private IBluetoothService BluetoothService { get; }
+
+		//public SourceCache<float, short> ServoPositions { get; set; }
+		[Reactive]
+		public float Position { get; set; }
+
+		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
 	}
 }

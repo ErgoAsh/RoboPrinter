@@ -1,6 +1,6 @@
-﻿using RoboPrinter.Core.Models;
+﻿using DynamicData;
+using RoboPrinter.Core.Models;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RoboPrinter.Core.Interfaces
@@ -9,17 +9,17 @@ namespace RoboPrinter.Core.Interfaces
 	{
 		public Task<Task> Connect(BluetoothDevice device);
 		public void Disconnect();
-		public void RefreshDeviceList();
 
+		public void TestConnection(Action<int> callback);
 		public void SendPosition(short servoId, float position);
-		//public void ReceiveFeedbackLoop(data reader)
+		public void ReadFeedbackRecursive();
 
-		public IEnumerable<BluetoothDevice> GetAvailableBluetoothDevices();
+		public IObservable<IChangeSet<BluetoothDevice, string>> GetBluetoothDevicesObservable();
 
 		void OnPositionSentEvent(PositionEventArgs e);
-		void OnFeedbackReceivedEvent(PositionEventArgs e);
+		void OnFeedbackReceivedEvent(FeedbackEventArgs e);
 
 		public event EventHandler<PositionEventArgs> PositionSent;
-		public event EventHandler<PositionEventArgs> FeedbackReceived;
+		public event EventHandler<FeedbackEventArgs> FeedbackReceived;
 	}
 }

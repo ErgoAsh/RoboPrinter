@@ -1,7 +1,7 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using ReactiveUI;
+using System;
 
 namespace RoboPrinter.Avalonia
 {
@@ -18,10 +18,8 @@ namespace RoboPrinter.Avalonia
 			{
 				return (Control)Activator.CreateInstance(type)!;
 			}
-			else
-			{
-				return new TextBlock {Text = "Not Found: " + name};
-			}
+
+			return new TextBlock {Text = "Not Found: " + name};
 		}
 
 		public bool Match(object data)

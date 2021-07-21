@@ -11,19 +11,19 @@ namespace RoboPrinter.Avalonia.Views
 {
 	public class ServoTestControl : ReactiveUserControl<ServoTestViewModel>
 	{
-		private Button UpdateButton => this.FindControl<Button>("UpdateButton");
-		private Slider TempSliderButton => this.FindControl<Slider>("ServoSlider1");
-		private TextBlock TempSliderTextBlock => this.FindControl<TextBlock>("PositionTextBlock1");
-
 		public ServoTestControl()
 		{
 			InitializeComponent();
 		}
 
+		private Button UpdateButton => this.FindControl<Button>("UpdateButton");
+		private Slider TempSliderButton => this.FindControl<Slider>("ServoSlider1");
+		private TextBlock TempSliderTextBlock => this.FindControl<TextBlock>("PositionTextBlock1");
+
 		private void InitializeComponent()
 		{
 			AvaloniaXamlLoader.Load(this);
-			
+
 			ViewModel = new ServoTestViewModel();
 
 			this.WhenActivated(disposable =>
@@ -36,7 +36,7 @@ namespace RoboPrinter.Avalonia.Views
 					viewModel => viewModel.Position,
 					view => view.TempSliderButton.Value).DisposeWith(disposable);
 
-				this.OneWayBind(ViewModel, 
+				this.OneWayBind(ViewModel,
 					viewModel => viewModel.Position,
 					view => view.TempSliderTextBlock.Text).DisposeWith(disposable);
 			});

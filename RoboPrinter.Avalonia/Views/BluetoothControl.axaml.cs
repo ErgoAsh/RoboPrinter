@@ -11,19 +11,19 @@ namespace RoboPrinter.Avalonia.Views
 {
 	public class BluetoothControl : ReactiveUserControl<BluetoothViewModel>
 	{
-		private Button ConnectButton => this.FindControl<Button>("ConnectButton");
-		private Button TestConnectionButton => this.FindControl<Button>("TestConnectionButton");
-		private DataGrid ConnectionDataGrid => this.FindControl<DataGrid>("ConnectionDataGrid");
-		
 		public BluetoothControl()
 		{
 			InitializeComponent();
 		}
 
+		private Button ConnectButton => this.FindControl<Button>("ConnectButton");
+		private Button TestConnectionButton => this.FindControl<Button>("TestConnectionButton");
+		private DataGrid ConnectionDataGrid => this.FindControl<DataGrid>("ConnectionDataGrid");
+
 		private void InitializeComponent()
 		{
 			AvaloniaXamlLoader.Load(this);
-			
+
 			ViewModel = new BluetoothViewModel();
 
 			this.WhenActivated(disposable =>
@@ -31,7 +31,7 @@ namespace RoboPrinter.Avalonia.Views
 				this.BindCommand(ViewModel,
 					viewModel => viewModel.ConnectCommand,
 					view => view.ConnectButton).DisposeWith(disposable);
-				
+
 				this.BindCommand(ViewModel,
 					viewModel => viewModel.TestConnectionCommand,
 					view => view.TestConnectionButton).DisposeWith(disposable);

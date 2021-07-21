@@ -8,16 +8,16 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="RoboPrinter.Avalonia">
 
-    
+
     <TabControl>
         <TabItem Header="Bluetooth connection">
-            <views:BluetoothControl/>
+            <views:BluetoothControl />
         </TabItem>
         <TabItem Header="Servo calibration">
-            <views:CalibrationControl/>
+            <views:CalibrationControl />
         </TabItem>
         <TabItem Header="Servo tests">
-            <views:ServoTestControl/>
+            <views:ServoTestControl />
         </TabItem>
     </TabControl>
 

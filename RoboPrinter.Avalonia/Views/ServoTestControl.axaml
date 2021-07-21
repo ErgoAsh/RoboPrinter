@@ -7,27 +7,27 @@
                                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                                 x:Class="RoboPrinter.Avalonia.Views.ServoTestControl"
                                 x:TypeArguments="viewModels:ServoTestViewModel">
-    
+
     <Grid ColumnDefinitions="*,*" RowDefinitions="*,*,*,*,*,*">
 
-        <Slider x:Name="ServoSlider1" Minimum="60" Maximum="120" Grid.Row="0" Grid.Column="0"/>
-        <TextBlock x:Name="PositionTextBlock1" Grid.Row="0" Grid.Column="1"/>
+        <Slider x:Name="ServoSlider1" Minimum="60" Maximum="120" Grid.Row="0" Grid.Column="0" />
+        <TextBlock x:Name="PositionTextBlock1" Grid.Row="0" Grid.Column="1" />
 
-        <Slider x:Name="ServoSlider2" Minimum="60" Maximum="120" Grid.Row="1" Grid.Column="0"/>
-        <TextBlock x:Name="PositionTextBlock2" Grid.Row="1" Grid.Column="1"/>
+        <Slider x:Name="ServoSlider2" Minimum="60" Maximum="120" Grid.Row="1" Grid.Column="0" />
+        <TextBlock x:Name="PositionTextBlock2" Grid.Row="1" Grid.Column="1" />
 
-        <Slider x:Name="ServoSlider3" Minimum="60" Maximum="120" Grid.Row="2" Grid.Column="0"/>
-        <TextBlock x:Name="PositionTextBlock3" Grid.Row="2" Grid.Column="1"/>
+        <Slider x:Name="ServoSlider3" Minimum="60" Maximum="120" Grid.Row="2" Grid.Column="0" />
+        <TextBlock x:Name="PositionTextBlock3" Grid.Row="2" Grid.Column="1" />
 
-        <Slider x:Name="ServoSlider4" Minimum="60" Maximum="120" Grid.Row="3" Grid.Column="0"/>
-        <TextBlock x:Name="PositionTextBlock4" Grid.Row="3" Grid.Column="1"/>
+        <Slider x:Name="ServoSlider4" Minimum="60" Maximum="120" Grid.Row="3" Grid.Column="0" />
+        <TextBlock x:Name="PositionTextBlock4" Grid.Row="3" Grid.Column="1" />
 
-        <Slider x:Name="ServoSlider5" Minimum="60" Maximum="120" Grid.Row="4" Grid.Column="0"/>
-        <TextBlock x:Name="PositionTextBlock5" Grid.Row="4" Grid.Column="1"/>
+        <Slider x:Name="ServoSlider5" Minimum="60" Maximum="120" Grid.Row="4" Grid.Column="0" />
+        <TextBlock x:Name="PositionTextBlock5" Grid.Row="4" Grid.Column="1" />
 
         <Button x:Name="UpdateButton" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock Text="Update"/>
+            <TextBlock Text="Update" />
         </Button>
     </Grid>
-    
+
 </reactiveUi:ReactiveUserControl>
