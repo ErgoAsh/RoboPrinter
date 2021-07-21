@@ -42,10 +42,19 @@ namespace RoboPrinter.Core.ViewModels
 					})
 					.DisposeWith(disposable);
 			});
-			//
-			// IObservableCache<BluetoothDevice, string> changeSet = Items
-			// 	.ToObservableChangeSet(item => item.Id)
-			// 	.AsObservableCache();
+			
+			ConnectCommand = ReactiveCommand.Create(() =>
+			{
+				_bluetoothService.Connect(SelectedItem);
+			});
+			
+			TestConnectionCommand = ReactiveCommand.Create(() =>
+			{
+				_bluetoothService.TestConnection(SelectedItem, timeInterval =>
+				{
+					
+				});
+			});
 		}
 
 		[Reactive]

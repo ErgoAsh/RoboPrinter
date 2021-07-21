@@ -7,10 +7,10 @@ namespace RoboPrinter.Core.Interfaces
 {
 	public interface IBluetoothService
 	{
-		public Task<Task> Connect(BluetoothDevice device);
+		public Task Connect(BluetoothDevice device);
 		public void Disconnect();
 
-		public void TestConnection(Action<int> callback);
+		public void TestConnection(BluetoothDevice device, Action<int> callback);
 		public void SendPosition(short servoId, float position);
 		public void ReadFeedbackRecursive();
 

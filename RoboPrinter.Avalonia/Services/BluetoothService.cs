@@ -76,7 +76,7 @@ namespace RoboPrinter.Avalonia.Services
 		public event EventHandler<PositionEventArgs> PositionSent = null!;
 		public event EventHandler<FeedbackEventArgs> FeedbackReceived = null!;
 
-		public async Task<Task> Connect(BluetoothDevice device)
+		public async Task Connect(BluetoothDevice device)
 		{
 			// Initialize the target Bluetooth BR device
 			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(device.Id);
@@ -84,17 +84,20 @@ namespace RoboPrinter.Avalonia.Services
 			// Check that the service meets this App's minimum requirement
 			if (!SupportsProtection(service))
 			{
-				return Task.CompletedTask;
+				return;
 			}
 
 			_service = service;
 			_socket = new StreamSocket();
 
-			return _socket.ConnectAsync(
+			await _socket.ConnectAsync(
 				_service.ConnectionHostName,
 				_service.ConnectionServiceName,
 				SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
-			).AsTask();
+			);
+
+			_writer = new DataWriter(_socket.OutputStream);
+			_reader = new DataReader(_socket.InputStream);
 		}
 
 		public void Disconnect()
@@ -200,7 +203,7 @@ namespace RoboPrinter.Avalonia.Services
 			FeedbackReceived.Invoke(this, e);
 		}
 
-		public void TestConnection(Action<int> callback)
+		public void TestConnection(BluetoothDevice device, Action<int> callback)
 		{
 			DateTime tBefore = DateTime.Now;
 
