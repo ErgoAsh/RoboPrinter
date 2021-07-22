@@ -8,26 +8,23 @@
                                 x:Class="RoboPrinter.Avalonia.Views.ServoTestControl"
                                 x:TypeArguments="viewModels:ServoTestViewModel">
 
-    <Grid ColumnDefinitions="*,*" RowDefinitions="*,*,*,*,*,*">
+    <StackLayout>
+        <DataGrid Name="TableGrid" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Slider Minimum="60" Maximum="120" Value="{Binding Position, Mode=TwoWay}"></Slider>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTextColumn Header="Value" Binding="{Binding Position }"></DataGridTextColumn>
+            </DataGrid.Columns>
 
-        <Slider x:Name="ServoSlider1" Minimum="60" Maximum="120" Grid.Row="0" Grid.Column="0" />
-        <TextBlock x:Name="PositionTextBlock1" Grid.Row="0" Grid.Column="1" />
-
-        <Slider x:Name="ServoSlider2" Minimum="60" Maximum="120" Grid.Row="1" Grid.Column="0" />
-        <TextBlock x:Name="PositionTextBlock2" Grid.Row="1" Grid.Column="1" />
-
-        <Slider x:Name="ServoSlider3" Minimum="60" Maximum="120" Grid.Row="2" Grid.Column="0" />
-        <TextBlock x:Name="PositionTextBlock3" Grid.Row="2" Grid.Column="1" />
-
-        <Slider x:Name="ServoSlider4" Minimum="60" Maximum="120" Grid.Row="3" Grid.Column="0" />
-        <TextBlock x:Name="PositionTextBlock4" Grid.Row="3" Grid.Column="1" />
-
-        <Slider x:Name="ServoSlider5" Minimum="60" Maximum="120" Grid.Row="4" Grid.Column="0" />
-        <TextBlock x:Name="PositionTextBlock5" Grid.Row="4" Grid.Column="1" />
-
+        </DataGrid>
         <Button x:Name="UpdateButton" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
             <TextBlock Text="Update" />
         </Button>
-    </Grid>
-
+    </StackLayout>
 </reactiveUi:ReactiveUserControl>

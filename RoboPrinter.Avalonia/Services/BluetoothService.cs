@@ -1,11 +1,10 @@
 ﻿using DynamicData;
+using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using System;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive.Subjects;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Networking.Sockets;
@@ -16,6 +15,9 @@ namespace RoboPrinter.Avalonia.Services
 	public class BluetoothService : IBluetoothService, IDisposable
 	{
 		private const string BluetoothProtocolId = "{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}";
+		private readonly Subject<string> _dataReceived;
+
+		private readonly Subject<string> _dataSent;
 
 		private readonly SourceCache<BluetoothDevice, string> _devices;
 		private DeviceWatcher? _deviceWatcher;
@@ -26,8 +28,103 @@ namespace RoboPrinter.Avalonia.Services
 
 		public BluetoothService()
 		{
+			_dataSent = new Subject<string>();
+			_dataReceived = new Subject<string>();
 			_devices = new SourceCache<BluetoothDevice, string>(device => device.Id);
 
+			InitializeWatcher();
+		}
+
+		[Reactive]
+		public bool IsTestInProgress { get; set; }
+
+		public IObservable<string> DataReceived => _dataReceived;
+		public IObservable<IChangeSet<BluetoothDevice, string>> BluetoothDeviceChange => _devices.Connect();
+		public IObservable<string> DataSent => _dataSent;
+
+		public async void Connect(BluetoothDevice device, Action onCompleted, Action<Exception> onError)
+		{
+			// Initialize the target Bluetooth BR device
+			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(
+				device.Id + "#RFCOMM:00000000:{" + RfcommServiceId.SerialPort.Uuid + "}");
+
+			// Check that the service meets this App's minimum requirement
+			if (!SupportsProtection(service))
+			{
+				return;
+			}
+
+			_service = service;
+			_socket = new StreamSocket();
+
+			try
+			{
+				await _socket.ConnectAsync(
+					_service.ConnectionHostName,
+					_service.ConnectionServiceName,
+					SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
+				);
+
+				_writer = new DataWriter(_socket.OutputStream);
+				_reader = new DataReader(_socket.InputStream);
+
+				device.IsConnected = true;
+				_devices.AddOrUpdate(device);
+
+				onCompleted.Invoke();
+			}
+			catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND
+			{
+				onError.Invoke(ex);
+				// TODO
+			}
+			catch (Exception ex) when ((uint)ex.HResult == 0x80072740) // WSAEADDRINUSE
+			{
+				onError.Invoke(ex);
+				// TODO Only one usage of each socket address (protocol/network address/port) is normally permitted
+			}
+		}
+
+		public void Disconnect()
+		{
+			// TODO
+		}
+
+		public async void SendData(string data)
+		{
+			if (_service == null || _writer == null || _socket == null)
+			{
+				throw new Exception(
+					"[BluetoothService::SendPosition] Connection has not been established yet");
+			}
+
+			_writer.WriteString(data);
+
+			await _writer.StoreAsync();
+			await _writer.FlushAsync();
+		}
+
+
+		void IDisposable.Dispose()
+		{
+			if (_deviceWatcher?.Status
+				is DeviceWatcherStatus.Started
+				or DeviceWatcherStatus.EnumerationCompleted)
+			{
+				_deviceWatcher?.Stop();
+			}
+
+			_deviceWatcher = null;
+
+			_writer?.DetachStream();
+			_writer?.Dispose();
+
+			_socket?.Dispose();
+			_service?.Dispose();
+		}
+
+		private void InitializeWatcher()
+		{
 			string[] requestedProperties = {"System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected"};
 
 			_deviceWatcher = DeviceInformation.CreateWatcher(
@@ -49,12 +146,12 @@ namespace RoboPrinter.Avalonia.Services
 
 			_deviceWatcher.Updated += (_, deviceInfoUpdate) =>
 			{
-				//if(deviceInfoUpdate.Name != "")
+				if (deviceInfoUpdate.Properties.ContainsKey("Name"))
 				{
 					_devices.AddOrUpdate(new BluetoothDevice
 					{
 						Id = deviceInfoUpdate.Id,
-						Name = deviceInfoUpdate.Properties["name"] as string,
+						Name = deviceInfoUpdate.Properties["Name"] as string,
 						IsConnected = false
 					});
 				}
@@ -73,36 +170,40 @@ namespace RoboPrinter.Avalonia.Services
 			_deviceWatcher.Start();
 		}
 
-		public event EventHandler<PositionEventArgs> PositionSent = null!;
-		public event EventHandler<FeedbackEventArgs> FeedbackReceived = null!;
-
-		public async Task Connect(BluetoothDevice device)
+		public void TestConnection(
+			BluetoothDevice device,
+			TimeSpan timeout,
+			Action<int> onCompleted,
+			Action<Exception> onError)
 		{
-			// Initialize the target Bluetooth BR device
-			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(device.Id);
+			// TODO use timeoutSeconds
+			IsTestInProgress = true;
 
-			// Check that the service meets this App's minimum requirement
-			if (!SupportsProtection(service))
+			DateTime tBefore = DateTime.Now;
+
+			Connect(device, () =>
 			{
-				return;
-			}
+				SendData("T");
 
-			_service = service;
-			_socket = new StreamSocket();
-
-			await _socket.ConnectAsync(
-				_service.ConnectionHostName,
-				_service.ConnectionServiceName,
-				SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
-			);
-
-			_writer = new DataWriter(_socket.OutputStream);
-			_reader = new DataReader(_socket.InputStream);
-		}
-
-		public void Disconnect()
-		{
-			// TODO
+				DataReceived
+					.Where(parameter => parameter[0] == 'T')
+					.Take(1)
+					//.TakeUntil(new DateTimeOffset(DateTime.Now, timeout), )
+					.Subscribe(
+						_ =>
+						{
+							onCompleted.Invoke(DateTime.Now.Subtract(tBefore).Milliseconds);
+							IsTestInProgress = false;
+						}, error =>
+						{
+							onError.Invoke(error);
+							IsTestInProgress = false;
+						}); //TODO check onComplete if isTestInProgress, return error then
+			}, error =>
+			{
+				onError.Invoke(error);
+				IsTestInProgress = false;
+			});
 		}
 
 		public async void ReadFeedbackRecursive()
@@ -124,6 +225,8 @@ namespace RoboPrinter.Avalonia.Services
 					// The underlying socket was closed before we were able to read the whole data
 					return;
 				}
+
+				_dataReceived.OnNext(size.ToString());
 
 				//ReceiveStringLoop(chatReader);
 				ReadFeedbackRecursive();
@@ -150,97 +253,6 @@ namespace RoboPrinter.Avalonia.Services
 					}
 				}
 			}
-		}
-
-		public IObservable<IChangeSet<BluetoothDevice, string>> GetBluetoothDevicesObservable()
-		{
-			return _devices.Connect();
-		}
-
-		public async void SendPosition(short servoId, float position)
-		{
-			if (_service == null)
-			{
-				throw new Exception(
-					"[BluetoothService::SendPosition] Connection has not been established yet");
-			}
-
-			if (servoId is < 0 or > 5)
-			{
-				return; // TODO throw new exception, read 5 from somewhere
-			}
-
-			if (position is < 0 or > 180)
-			{
-				return;
-			}
-
-			StringBuilder stringBuilder = new StringBuilder()
-				.Append((char)(servoId + 65))
-				.Append(position)
-				.Append('\n');
-
-			if (_writer == null || _socket == null)
-			{
-				//Connect(_service.)
-			}
-			else
-			{
-				_writer.WriteString(stringBuilder.ToString());
-
-				await _writer.StoreAsync();
-				await _writer.FlushAsync();
-			}
-		}
-
-		void IBluetoothService.OnPositionSentEvent(PositionEventArgs e)
-		{
-			PositionSent.Invoke(this, e);
-		}
-
-		void IBluetoothService.OnFeedbackReceivedEvent(FeedbackEventArgs e)
-		{
-			FeedbackReceived.Invoke(this, e);
-		}
-
-		public void TestConnection(BluetoothDevice device, Action<int> callback)
-		{
-			DateTime tBefore = DateTime.Now;
-
-			IObservable<EventPattern<FeedbackEventArgs>> observable = Observable.FromEventPattern<FeedbackEventArgs>(
-				handler => FeedbackReceived += handler,
-				handler => FeedbackReceived -= handler);
-
-			observable
-				.Where(pattern => pattern.EventArgs.IsTest)
-				.Take(1) // Subscribe only one event execution
-				.Subscribe(
-					args =>
-					{
-						callback.Invoke(DateTime.Now.Subtract(tBefore).Milliseconds);
-					},
-					error =>
-					{
-						//throw new Exception()
-					});
-		}
-
-		void IDisposable.Dispose()
-		{
-			if (_deviceWatcher?.Status
-				is DeviceWatcherStatus.Started
-				or DeviceWatcherStatus.EnumerationCompleted)
-			{
-				_deviceWatcher?.Stop();
-			}
-
-			_deviceWatcher = null;
-
-			_writer?.DetachStream();
-			_writer?.Dispose();
-
-			_socket?.Dispose();
-			_service?.Dispose();
 		}
 
 		// This App requires a connection that is encrypted but does not care about

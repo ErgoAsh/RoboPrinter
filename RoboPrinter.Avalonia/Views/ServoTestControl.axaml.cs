@@ -2,9 +2,12 @@
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Templates;
 using Avalonia.ReactiveUI;
+using DynamicData;
 using ReactiveUI;
 using RoboPrinter.Core.ViewModels;
+using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 
 namespace RoboPrinter.Avalonia.Views
@@ -17,8 +20,7 @@ namespace RoboPrinter.Avalonia.Views
 		}
 
 		private Button UpdateButton => this.FindControl<Button>("UpdateButton");
-		private Slider TempSliderButton => this.FindControl<Slider>("ServoSlider1");
-		private TextBlock TempSliderTextBlock => this.FindControl<TextBlock>("PositionTextBlock1");
+		private DataGrid TableGrid => this.FindControl<DataGrid>("TableGrid");
 
 		private void InitializeComponent()
 		{

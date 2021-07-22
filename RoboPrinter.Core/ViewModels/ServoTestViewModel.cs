@@ -1,32 +1,52 @@
-﻿using ReactiveUI;
+﻿using DynamicData;
+using DynamicData.Binding;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
+using RoboPrinter.Core.Models;
 using Splat;
+using System;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace RoboPrinter.Core.ViewModels
 {
-	public class ServoTestViewModel : ReactiveObject
+	public class ServoTestViewModel : ReactiveObject, IActivatableViewModel
 	{
-		public ServoTestViewModel(IBluetoothService bluetoothService = null)
+		private IServoService _servoService;
+		
+		public ServoTestViewModel(IServoService servoService = null)
 		{
-			BluetoothService = bluetoothService ?? Locator.Current.GetService<IBluetoothService>();
+			_servoService = servoService ?? Locator.Current.GetService<IServoService>();
 
-			//ServoPositions = new SourceCache<float, short>();
+			Activator = new ViewModelActivator();
+			this.WhenActivated(disposable =>
+			{
+				ServoCollection = new ObservableCollectionExtended<Servo>();
 
+				_servoService
+					.GetServoCollectionObservable()
+					.AsObservable()
+					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
+					.Bind(ServoCollection)
+					.Subscribe()
+					.DisposeWith(disposable);
+			});
+				
 			UpdatePositionCommand = ReactiveCommand.Create(() =>
 			{
-				//ServoPositions[data.Item1] = data.Item2;
-				BluetoothService.SendPosition(0, Position);
+				foreach (Servo servo in ServoCollection)
+				{
+					_servoService.SendPosition(servo.Id, servo.Position);
+				}
 			});
 		}
 
-		private IBluetoothService BluetoothService { get; }
-
-		//public SourceCache<float, short> ServoPositions { get; set; }
-		[Reactive]
-		public float Position { get; set; }
+		public ObservableCollectionExtended<Servo> ServoCollection { get; set; }
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
+		
+		public ViewModelActivator Activator { get; }
 	}
 }

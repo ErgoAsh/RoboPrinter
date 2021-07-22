@@ -27,32 +27,30 @@ namespace RoboPrinter.Core.ViewModels
 			{
 				Items = new ObservableCollectionExtended<BluetoothDevice>();
 
-				_bluetoothService
-					.GetBluetoothDevicesObservable()
+				_bluetoothService.BluetoothDeviceChange
 					.AsObservable()
 					.Bind(Items)
 					.Subscribe()
-					.DisposeWith(disposable);
-
-				this.WhenAnyValue(vm => vm.SelectedItem)
-					.Where(item => item != null)
-					.Subscribe(item =>
-					{
-						Console.WriteLine(item.Id);
-					})
 					.DisposeWith(disposable);
 			});
 			
 			ConnectCommand = ReactiveCommand.Create(() =>
 			{
-				_bluetoothService.Connect(SelectedItem);
+				_bluetoothService.Connect(SelectedItem, () => { } , error =>
+				{
+					// TODO show error tip
+				});
 			});
 			
 			TestConnectionCommand = ReactiveCommand.Create(() =>
 			{
-				_bluetoothService.TestConnection(SelectedItem, timeInterval =>
+				_bluetoothService.TestConnection(SelectedItem, TimeSpan.FromSeconds(5), time =>
 				{
-					
+					// TODO Show ping
+				},
+				error =>
+				{
+					// TODO show error tip
 				});
 			});
 		}
@@ -62,8 +60,8 @@ namespace RoboPrinter.Core.ViewModels
 
 		public ObservableCollectionExtended<BluetoothDevice> Items { get; private set; }
 
-		public ReactiveCommand<Unit, Unit> TestConnectionCommand { get; set; }
-		public ReactiveCommand<Unit, Unit> ConnectCommand { get; set; }
+		public ReactiveCommand<Unit, Unit> TestConnectionCommand { get; }
+		public ReactiveCommand<Unit, Unit> ConnectCommand { get; }
 
 		public ViewModelActivator Activator { get; }
 	}

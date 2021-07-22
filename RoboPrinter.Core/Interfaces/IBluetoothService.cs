@@ -7,19 +7,19 @@ namespace RoboPrinter.Core.Interfaces
 {
 	public interface IBluetoothService
 	{
-		public Task Connect(BluetoothDevice device);
 		public void Disconnect();
+		public void Connect(BluetoothDevice device, Action onCompleted, Action<Exception> onError);
 
-		public void TestConnection(BluetoothDevice device, Action<int> callback);
-		public void SendPosition(short servoId, float position);
-		public void ReadFeedbackRecursive();
+		public void TestConnection(
+			BluetoothDevice device,
+			TimeSpan timeout,
+			Action<int> onCompleted,
+			Action<Exception> onError);
+		
+		public void SendData(string data);
 
-		public IObservable<IChangeSet<BluetoothDevice, string>> GetBluetoothDevicesObservable();
-
-		void OnPositionSentEvent(PositionEventArgs e);
-		void OnFeedbackReceivedEvent(FeedbackEventArgs e);
-
-		public event EventHandler<PositionEventArgs> PositionSent;
-		public event EventHandler<FeedbackEventArgs> FeedbackReceived;
+		public IObservable<string> DataSent { get; }
+		public IObservable<string> DataReceived { get; }
+		public IObservable<IChangeSet<BluetoothDevice, string>> BluetoothDeviceChange { get; }
 	}
 }
