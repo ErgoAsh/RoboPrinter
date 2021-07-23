@@ -1,7 +1,6 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using Splat;
@@ -14,8 +13,8 @@ namespace RoboPrinter.Core.ViewModels
 {
 	public class ServoTestViewModel : ReactiveObject, IActivatableViewModel
 	{
-		private IServoService _servoService;
-		
+		private readonly IServoService _servoService;
+
 		public ServoTestViewModel(IServoService servoService = null)
 		{
 			_servoService = servoService ?? Locator.Current.GetService<IServoService>();
@@ -25,17 +24,24 @@ namespace RoboPrinter.Core.ViewModels
 			{
 				ServoCollection = new ObservableCollectionExtended<Servo>();
 
-				_servoService
-					.GetServoCollectionObservable()
+				_servoService.ServoCollectionChange
 					.AsObservable()
 					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
 					.Bind(ServoCollection)
-					.Subscribe()
+					.Subscribe(change => Console.WriteLine(change.SortedItems[0].Value.Position))
 					.DisposeWith(disposable);
-			});
 				
+				//ServoCollection.ObserveCollectionChanges()
+			});
+
+			// this.WhenAnyValue(vm => vm.ServoCollection[0], () =>
+			// 	{
+			// 		
+			// 	});
+
 			UpdatePositionCommand = ReactiveCommand.Create(() =>
 			{
+				// TODO update all
 				foreach (Servo servo in ServoCollection)
 				{
 					_servoService.SendPosition(servo.Id, servo.Position);
@@ -46,7 +52,7 @@ namespace RoboPrinter.Core.ViewModels
 		public ObservableCollectionExtended<Servo> ServoCollection { get; set; }
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
-		
+
 		public ViewModelActivator Activator { get; }
 	}
 }

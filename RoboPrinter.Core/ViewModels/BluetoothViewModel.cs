@@ -27,31 +27,31 @@ namespace RoboPrinter.Core.ViewModels
 			{
 				Items = new ObservableCollectionExtended<BluetoothDevice>();
 
-				_bluetoothService.BluetoothDeviceChange
+				_bluetoothService.BluetoothDeviceCollectionChange
 					.AsObservable()
 					.Bind(Items)
 					.Subscribe()
 					.DisposeWith(disposable);
 			});
-			
+
 			ConnectCommand = ReactiveCommand.Create(() =>
 			{
-				_bluetoothService.Connect(SelectedItem, () => { } , error =>
+				_bluetoothService.Connect(SelectedItem, () => { }, error =>
 				{
 					// TODO show error tip
 				});
 			});
-			
+
 			TestConnectionCommand = ReactiveCommand.Create(() =>
 			{
 				_bluetoothService.TestConnection(SelectedItem, TimeSpan.FromSeconds(5), time =>
-				{
-					// TODO Show ping
-				},
-				error =>
-				{
-					// TODO show error tip
-				});
+					{
+						// TODO Show ping
+					},
+					error =>
+					{
+						// TODO show error tip
+					});
 			});
 		}
 

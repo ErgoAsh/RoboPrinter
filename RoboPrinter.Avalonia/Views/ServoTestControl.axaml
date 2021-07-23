@@ -8,23 +8,23 @@
                                 x:Class="RoboPrinter.Avalonia.Views.ServoTestControl"
                                 x:TypeArguments="viewModels:ServoTestViewModel">
 
-    <StackLayout>
+    <StackPanel>
         <DataGrid Name="TableGrid" IsReadOnly="True">
             <DataGrid.Columns>
-                <DataGridTemplateColumn>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" Width="*"/>
+                
+                <DataGridTemplateColumn Header="Slider" Width="3*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Slider Minimum="60" Maximum="120" Value="{Binding Position, Mode=TwoWay}"></Slider>
+                            <Slider Minimum="60" Maximum="120" Value="{Binding Path=Position, Mode=TwoWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
-                <DataGridTextColumn Header="Value" Binding="{Binding Position }"></DataGridTextColumn>
+
+                <DataGridTextColumn Header="Value" Binding="{Binding Position, Mode=TwoWay}"  Width="*"/>
             </DataGrid.Columns>
 
         </DataGrid>
-        <Button x:Name="UpdateButton" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock Text="Update" />
-        </Button>
-    </StackLayout>
+        <Button Name="UpdateButton">Update</Button>
+    </StackPanel>
 </reactiveUi:ReactiveUserControl>

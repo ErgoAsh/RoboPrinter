@@ -15,11 +15,11 @@ namespace RoboPrinter.Avalonia.Services
 	public class BluetoothService : IBluetoothService, IDisposable
 	{
 		private const string BluetoothProtocolId = "{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}";
+
 		private readonly Subject<string> _dataReceived;
-
 		private readonly Subject<string> _dataSent;
-
 		private readonly SourceCache<BluetoothDevice, string> _devices;
+
 		private DeviceWatcher? _deviceWatcher;
 		private DataReader? _reader;
 		private RfcommDeviceService? _service;
@@ -39,7 +39,7 @@ namespace RoboPrinter.Avalonia.Services
 		public bool IsTestInProgress { get; set; }
 
 		public IObservable<string> DataReceived => _dataReceived;
-		public IObservable<IChangeSet<BluetoothDevice, string>> BluetoothDeviceChange => _devices.Connect();
+		public IObservable<IChangeSet<BluetoothDevice, string>> BluetoothDeviceCollectionChange => _devices.Connect();
 		public IObservable<string> DataSent => _dataSent;
 
 		public async void Connect(BluetoothDevice device, Action onCompleted, Action<Exception> onError)
@@ -97,11 +97,49 @@ namespace RoboPrinter.Avalonia.Services
 				throw new Exception(
 					"[BluetoothService::SendPosition] Connection has not been established yet");
 			}
+			
+			// If not ends with \n, add one
 
 			_writer.WriteString(data);
 
 			await _writer.StoreAsync();
 			await _writer.FlushAsync();
+		}
+
+		public void TestConnection(
+			BluetoothDevice device,
+			TimeSpan timeout,
+			Action<int> onCompleted,
+			Action<Exception> onError)
+		{
+			// TODO use timeoutSeconds
+			IsTestInProgress = true;
+
+			DateTime tBefore = DateTime.Now;
+
+			Connect(device, () =>
+			{
+				SendData("T");
+
+				DataReceived
+					.Where(parameter => parameter[0] == 'T')
+					.Take(1)
+					//.TakeUntil(new DateTimeOffset(DateTime.Now, timeout), )
+					.Subscribe(
+						_ =>
+						{
+							onCompleted.Invoke(DateTime.Now.Subtract(tBefore).Milliseconds);
+							IsTestInProgress = false;
+						}, error =>
+						{
+							onError.Invoke(error);
+							IsTestInProgress = false;
+						}); //TODO check onComplete if isTestInProgress, return error then
+			}, error =>
+			{
+				onError.Invoke(error);
+				IsTestInProgress = false;
+			});
 		}
 
 
@@ -168,42 +206,6 @@ namespace RoboPrinter.Avalonia.Services
 			};
 
 			_deviceWatcher.Start();
-		}
-
-		public void TestConnection(
-			BluetoothDevice device,
-			TimeSpan timeout,
-			Action<int> onCompleted,
-			Action<Exception> onError)
-		{
-			// TODO use timeoutSeconds
-			IsTestInProgress = true;
-
-			DateTime tBefore = DateTime.Now;
-
-			Connect(device, () =>
-			{
-				SendData("T");
-
-				DataReceived
-					.Where(parameter => parameter[0] == 'T')
-					.Take(1)
-					//.TakeUntil(new DateTimeOffset(DateTime.Now, timeout), )
-					.Subscribe(
-						_ =>
-						{
-							onCompleted.Invoke(DateTime.Now.Subtract(tBefore).Milliseconds);
-							IsTestInProgress = false;
-						}, error =>
-						{
-							onError.Invoke(error);
-							IsTestInProgress = false;
-						}); //TODO check onComplete if isTestInProgress, return error then
-			}, error =>
-			{
-				onError.Invoke(error);
-				IsTestInProgress = false;
-			});
 		}
 
 		public async void ReadFeedbackRecursive()

@@ -2,12 +2,9 @@
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Templates;
 using Avalonia.ReactiveUI;
-using DynamicData;
 using ReactiveUI;
 using RoboPrinter.Core.ViewModels;
-using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 
 namespace RoboPrinter.Avalonia.Views
@@ -33,14 +30,10 @@ namespace RoboPrinter.Avalonia.Views
 				this.BindCommand(ViewModel,
 					viewModel => viewModel.UpdatePositionCommand,
 					view => view.UpdateButton).DisposeWith(disposable);
-
-				this.Bind(ViewModel,
-					viewModel => viewModel.Position,
-					view => view.TempSliderButton.Value).DisposeWith(disposable);
-
+				
 				this.OneWayBind(ViewModel,
-					viewModel => viewModel.Position,
-					view => view.TempSliderTextBlock.Text).DisposeWith(disposable);
+					viewModel => viewModel.ServoCollection,
+					view => view.TableGrid.Items).DisposeWith(disposable);
 			});
 		}
 	}

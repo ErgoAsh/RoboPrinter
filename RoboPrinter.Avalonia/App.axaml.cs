@@ -15,9 +15,10 @@ namespace RoboPrinter.Avalonia
 		{
 			AvaloniaXamlLoader.Load(this);
 
-			var bluetoothService = new BluetoothService();
+			BluetoothService? bluetoothService = new BluetoothService();
 			Locator.CurrentMutable.RegisterLazySingleton(() => bluetoothService, typeof(IBluetoothService));
-			Locator.CurrentMutable.RegisterLazySingleton(() => new ServoService(bluetoothService), typeof(IServoService));
+			Locator.CurrentMutable.RegisterLazySingleton(() => new ServoService(bluetoothService),
+				typeof(IServoService));
 		}
 
 		public override void OnFrameworkInitializationCompleted()

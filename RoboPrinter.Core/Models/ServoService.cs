@@ -1,6 +1,7 @@
 ﻿// unset
 
 using DynamicData;
+using DynamicData.Kernel;
 using RoboPrinter.Core.Interfaces;
 using Splat;
 using System;
@@ -12,24 +13,43 @@ namespace RoboPrinter.Core.Models
 	public class ServoService : IServoService
 	{
 		private readonly IBluetoothService _bluetoothService;
+		private readonly SourceCache<Servo, short> _servos;
+
 		public ServoService(IBluetoothService bluetoothService)
 		{
 			_bluetoothService = bluetoothService ?? Locator.Current.GetService<IBluetoothService>();
+
+			_servos = new SourceCache<Servo, short>(item => item.Id);
+			SetupServos();
 		}
-		
-		public Servo GetServo(short id)
+
+		private void SetupServos()
 		{
-			throw new NotImplementedException();
+			for (short i = 0; i < 5; i++)
+			{
+				_servos.AddOrUpdate(new Servo
+				{
+					Id = i, 
+					Position = 90,
+					MinPositionConstraint = 60,
+					MaxPositionConstraint = 90
+				});
+			}
+		}
+
+		public Optional<Servo> GetServo(short id)
+		{
+			return _servos.Lookup(id);
 		}
 
 		public void UpdateServo(Servo servo)
 		{
-			throw new NotImplementedException();
+			_servos.AddOrUpdate(servo);
 		}
 
 		public void UpdateServos(IEnumerable<Servo> servos)
 		{
-			throw new NotImplementedException();
+			_servos.AddOrUpdate(servos);
 		}
 
 		public void SendPosition(short id, float position)
@@ -39,7 +59,7 @@ namespace RoboPrinter.Core.Models
 				return; // TODO throw new exception, read 5 from somewhere
 			}
 
-			if (position is < 0 or > 180)
+			if (position is < 0 or > 180) // TODO change to support 360 deg servo
 			{
 				return;
 			}
@@ -48,15 +68,10 @@ namespace RoboPrinter.Core.Models
 				.Append((char)(id + 65))
 				.Append(position)
 				.Append('\n');
-			
+
 			_bluetoothService.SendData(stringBuilder.ToString());
 		}
 
-		public IObservable<IChangeSet<Servo, short>> GetServoCollectionObservable()
-		{
-			throw new NotImplementedException();
-		}
-
-		public IObservable<ServoEventArgs> ServoUpdate { get; }
+		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange => _servos.Connect();
 	}
 }
