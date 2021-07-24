@@ -27,7 +27,7 @@ namespace RoboPrinter.Core.ViewModels
 			this.WhenActivated(disposable =>
 			{
 				Items = new ObservableCollectionExtended<Servo>();
-				ItemsCache = new ObservableCollectionExtended<Servo>();
+				PositionsCache = new List<float>();
 
 				_servoService.ServoCollectionChange
 					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
@@ -42,19 +42,23 @@ namespace RoboPrinter.Core.ViewModels
 					{
 						if (IsUpdatingContinuously)
 						{
-							IEnumerable<Servo> servosToUpdate;
-							if (ItemsCache.Count == 0)
+							IEnumerable<float> positionsToUpdate;
+							if (PositionsCache.Count == 0)
 							{
-								ItemsCache.AddRange(Items);
-								servosToUpdate = ItemsCache;
+								positionsToUpdate = PositionsCache.AsEnumerable();
 							}
 							else
 							{
-								servosToUpdate = Items.Except(ItemsCache, new ServoComparer());
+								positionsToUpdate = Items
+									.Select(x => x.Position)
+									.Except(PositionsCache);
 							}
-							ItemsCache = Items;
-							
-							_servoService.UpdateServos(servosToUpdate);
+							PositionsCache = new List<float>(Items.Select(x => x.Position));
+
+							foreach (var pair in positionsToUpdate.Select((value, i) => new {i, value}))
+							{
+								_servoService.SendPosition((short)pair.i, pair.value);
+							}
 						}
 					})
 					.DisposeWith(disposable);
@@ -73,7 +77,7 @@ namespace RoboPrinter.Core.ViewModels
 		public int UpdateRateMilliseconds { get; set; } = 5000;
 		
 		public ObservableCollectionExtended<Servo> Items { get; set; }
-		public ObservableCollectionExtended<Servo> ItemsCache { get; set; } // TODO change type?
+		public List<float> PositionsCache { get; set; } // TODO change type?
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
 
