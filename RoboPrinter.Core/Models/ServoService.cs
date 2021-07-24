@@ -45,11 +45,16 @@ namespace RoboPrinter.Core.Models
 		public void UpdateServo(Servo servo)
 		{
 			_servos.AddOrUpdate(servo);
+			SendPosition(servo.Id, servo.Position);
 		}
 
 		public void UpdateServos(IEnumerable<Servo> servos)
 		{
 			_servos.AddOrUpdate(servos);
+			foreach (Servo servo in servos)
+			{
+				SendPosition(servo.Id, servo.Position);
+			}
 		}
 
 		public void SendPosition(short id, float position)

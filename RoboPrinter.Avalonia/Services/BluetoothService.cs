@@ -94,8 +94,9 @@ namespace RoboPrinter.Avalonia.Services
 		{
 			if (_service == null || _writer == null || _socket == null)
 			{
-				throw new Exception(
-					"[BluetoothService::SendPosition] Connection has not been established yet");
+				return;
+				//throw new Exception(
+				//	"[BluetoothService::SendPosition] Connection has not been established yet");
 			}
 			
 			// If not ends with \n, add one

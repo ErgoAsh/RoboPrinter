@@ -11,20 +11,23 @@
     <StackPanel>
         <DataGrid Name="TableGrid" IsReadOnly="True">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" Width="*"/>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*"/>
                 
                 <DataGridTemplateColumn Header="Slider" Width="3*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Slider Minimum="60" Maximum="120" Value="{Binding Path=Position, Mode=TwoWay}" />
+                            <Slider Minimum="60" Maximum="120" Value="{Binding Position, Mode=TwoWay}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-                <DataGridTextColumn Header="Value" Binding="{Binding Position, Mode=TwoWay}"  Width="*"/>
+                
+                <DataGridTextColumn Header="Value" Binding="{Binding Position}"  Width="*"/>
             </DataGrid.Columns>
 
         </DataGrid>
-        <Button Name="UpdateButton">Update</Button>
+        <StackPanel Orientation="Horizontal" Spacing="25" HorizontalAlignment="Center">
+            <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
+            <Button Name="UpdateButton">Update</Button>
+        </StackPanel>
     </StackPanel>
 </reactiveUi:ReactiveUserControl>

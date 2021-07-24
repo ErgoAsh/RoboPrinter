@@ -1,11 +1,13 @@
 ﻿// unset
 
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections.Generic;
 
 namespace RoboPrinter.Core.Models
 {
-	public sealed record Servo
+	public sealed class Servo : ReactiveObject
 	{
 		[Reactive]
 		public short Id { get; init; }
@@ -30,7 +32,8 @@ namespace RoboPrinter.Core.Models
 
 		public float? GetPositionUsingFeedback()
 		{
-			if (FeedbackVoltage is { } feedbackVoltage &&
+			// Check if all of these properties are not null
+			if (FeedbackVoltage is {} feedbackVoltage &&
 			    MaxPositionConstraint is {} maxPositionConstraint &&
 			    MinPositionConstraint is {} minPositionConstraint)
 			{
@@ -41,6 +44,28 @@ namespace RoboPrinter.Core.Models
 			}
 
 			return null;
+		}
+	}
+	
+	public class ServoComparer : IEqualityComparer<Servo>   
+	{
+		bool IEqualityComparer<Servo>.Equals(Servo x, Servo y)
+		{
+			if (x == null || y == null)
+				throw new ArgumentException("Object is null");
+			
+			return x.Id.Equals(y.Id) && 
+			       x.Position.Equals(y.Position) && 
+			       x.MinPositionConstraint.Equals(y.MinPositionConstraint) &&
+			       x.MaxPositionConstraint.Equals(y.MaxPositionConstraint);        
+		}
+
+		int IEqualityComparer<Servo>.GetHashCode(Servo obj)
+		{
+			if (Object.ReferenceEquals(obj, null))
+				return 0;               
+
+			return obj.Id.GetHashCode() + (int) obj.Position;       
 		}
 	}
 }

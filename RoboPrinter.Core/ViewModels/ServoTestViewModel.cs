@@ -1,17 +1,21 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using Splat;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace RoboPrinter.Core.ViewModels
 {
-	public class ServoTestViewModel : ReactiveObject, IActivatableViewModel
+	public class ServoTestViewModel : ReactiveObject, IActivatableViewModel // TODO add ILockable
 	{
 		private readonly IServoService _servoService;
 
@@ -22,34 +26,54 @@ namespace RoboPrinter.Core.ViewModels
 			Activator = new ViewModelActivator();
 			this.WhenActivated(disposable =>
 			{
-				ServoCollection = new ObservableCollectionExtended<Servo>();
+				Items = new ObservableCollectionExtended<Servo>();
+				ItemsCache = new ObservableCollectionExtended<Servo>();
 
 				_servoService.ServoCollectionChange
-					.AsObservable()
 					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
-					.Bind(ServoCollection)
-					.Subscribe(change => Console.WriteLine(change.SortedItems[0].Value.Position))
+					.Bind(Items)
+					.Subscribe()
 					.DisposeWith(disposable);
-				
-				//ServoCollection.ObserveCollectionChanges()
-			});
 
-			// this.WhenAnyValue(vm => vm.ServoCollection[0], () =>
-			// 	{
-			// 		
-			// 	});
+				Observable
+					.Interval(TimeSpan.FromMilliseconds(UpdateRateMilliseconds))
+					.ObserveOn(RxApp.MainThreadScheduler)
+					.Subscribe(_ =>
+					{
+						if (IsUpdatingContinuously)
+						{
+							IEnumerable<Servo> servosToUpdate;
+							if (ItemsCache.Count == 0)
+							{
+								ItemsCache.AddRange(Items);
+								servosToUpdate = ItemsCache;
+							}
+							else
+							{
+								servosToUpdate = Items.Except(ItemsCache, new ServoComparer());
+							}
+							ItemsCache = Items;
+							
+							_servoService.UpdateServos(servosToUpdate);
+						}
+					})
+					.DisposeWith(disposable);
+			});
 
 			UpdatePositionCommand = ReactiveCommand.Create(() =>
 			{
-				// TODO update all
-				foreach (Servo servo in ServoCollection)
-				{
-					_servoService.SendPosition(servo.Id, servo.Position);
-				}
+				_servoService.UpdateServos(Items);
 			});
 		}
 
-		public ObservableCollectionExtended<Servo> ServoCollection { get; set; }
+		[Reactive]
+		public bool IsUpdatingContinuously { get; set; } = false;
+
+		[Reactive]
+		public int UpdateRateMilliseconds { get; set; } = 5000;
+		
+		public ObservableCollectionExtended<Servo> Items { get; set; }
+		public ObservableCollectionExtended<Servo> ItemsCache { get; set; } // TODO change type?
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
 

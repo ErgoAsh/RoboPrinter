@@ -17,6 +17,7 @@ namespace RoboPrinter.Avalonia.Views
 		}
 
 		private Button UpdateButton => this.FindControl<Button>("UpdateButton");
+		private CheckBox UpdateCheckBox => this.FindControl<CheckBox>("UpdateCheckBox");
 		private DataGrid TableGrid => this.FindControl<DataGrid>("TableGrid");
 
 		private void InitializeComponent()
@@ -32,8 +33,12 @@ namespace RoboPrinter.Avalonia.Views
 					view => view.UpdateButton).DisposeWith(disposable);
 				
 				this.OneWayBind(ViewModel,
-					viewModel => viewModel.ServoCollection,
+					viewModel => viewModel.Items,
 					view => view.TableGrid.Items).DisposeWith(disposable);
+
+				this.Bind(ViewModel,
+					viewModel => viewModel.IsUpdatingContinuously,
+					view => view.UpdateCheckBox.IsChecked);
 			});
 		}
 	}
