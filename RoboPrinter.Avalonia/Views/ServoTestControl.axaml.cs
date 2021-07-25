@@ -31,7 +31,7 @@ namespace RoboPrinter.Avalonia.Views
 				this.BindCommand(ViewModel,
 					viewModel => viewModel.UpdatePositionCommand,
 					view => view.UpdateButton).DisposeWith(disposable);
-				
+
 				this.OneWayBind(ViewModel,
 					viewModel => viewModel.Items,
 					view => view.TableGrid.Items).DisposeWith(disposable);

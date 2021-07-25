@@ -8,13 +8,13 @@ namespace RoboPrinter.Core.Models
 	{
 		[Reactive]
 		public short ServoId { get; set; }
-		
+
 		[Reactive]
 		public float Voltage { get; set; }
-		
+
 		[Reactive]
 		public float? Position { get; set; }
-		
+
 		[Reactive]
 		public bool IsTest { get; set; }
 	}

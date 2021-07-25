@@ -98,7 +98,7 @@ namespace RoboPrinter.Avalonia.Services
 				//throw new Exception(
 				//	"[BluetoothService::SendPosition] Connection has not been established yet");
 			}
-			
+
 			// If not ends with \n, add one
 
 			_writer.WriteString(data);

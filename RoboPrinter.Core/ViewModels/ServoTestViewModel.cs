@@ -6,7 +6,6 @@ using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using Splat;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
@@ -23,11 +22,13 @@ namespace RoboPrinter.Core.ViewModels
 		{
 			_servoService = servoService ?? Locator.Current.GetService<IServoService>();
 
+			UpdateRateMilliseconds = 500;
+
 			Activator = new ViewModelActivator();
 			this.WhenActivated(disposable =>
 			{
 				Items = new ObservableCollectionExtended<Servo>();
-				PositionsCache = new List<float>();
+				PositionsCache = new List<KeyValuePair<short, float>>();
 
 				_servoService.ServoCollectionChange
 					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
@@ -42,7 +43,7 @@ namespace RoboPrinter.Core.ViewModels
 					{
 						if (IsUpdatingContinuously)
 						{
-							IEnumerable<float> positionsToUpdate;
+							IEnumerable<KeyValuePair<short, float>> positionsToUpdate;
 							if (PositionsCache.Count == 0)
 							{
 								positionsToUpdate = PositionsCache.AsEnumerable();
@@ -50,14 +51,16 @@ namespace RoboPrinter.Core.ViewModels
 							else
 							{
 								positionsToUpdate = Items
-									.Select(x => x.Position)
+									.Select(x => new KeyValuePair<short, float>(x.Id, x.Position))
 									.Except(PositionsCache);
 							}
-							PositionsCache = new List<float>(Items.Select(x => x.Position));
 
-							foreach (var pair in positionsToUpdate.Select((value, i) => new {i, value}))
+							PositionsCache = new List<KeyValuePair<short, float>>(
+								Items.Select(x => new KeyValuePair<short, float>(x.Id, x.Position)));
+
+							foreach (KeyValuePair<short, float> item in positionsToUpdate)
 							{
-								_servoService.SendPosition((short)pair.i, pair.value);
+								_servoService.SendPosition(item.Key, item.Value);
 							}
 						}
 					})
@@ -71,13 +74,13 @@ namespace RoboPrinter.Core.ViewModels
 		}
 
 		[Reactive]
-		public bool IsUpdatingContinuously { get; set; } = false;
+		public bool IsUpdatingContinuously { get; set; }
 
 		[Reactive]
-		public int UpdateRateMilliseconds { get; set; } = 5000;
-		
+		public int UpdateRateMilliseconds { get; set; }
+
 		public ObservableCollectionExtended<Servo> Items { get; set; }
-		public List<float> PositionsCache { get; set; } // TODO change type?
+		public List<KeyValuePair<short, float>> PositionsCache { get; set; }
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
 

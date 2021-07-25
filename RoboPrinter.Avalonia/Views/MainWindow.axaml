@@ -6,10 +6,12 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="RoboPrinter.Avalonia.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="RoboPrinter.Avalonia">
+        Title="Robo Printer"
+        CanResize="False" Height="450"
+        SystemDecorations="Full" WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="AcrylicBlur" Background="{x:Null}">
 
-
-    <TabControl>
+    <TabControl VerticalAlignment="Stretch">
         <TabItem Header="Bluetooth connection">
             <views:BluetoothControl />
         </TabItem>

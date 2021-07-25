@@ -33,12 +33,13 @@ namespace RoboPrinter.Core.Models
 		public float? GetPositionUsingFeedback()
 		{
 			// Check if all of these properties are not null
-			if (FeedbackVoltage is {} feedbackVoltage &&
-			    MaxPositionConstraint is {} maxPositionConstraint &&
-			    MinPositionConstraint is {} minPositionConstraint)
+			if (FeedbackVoltage is { } feedbackVoltage &&
+			    MaxPositionConstraint is { } maxPositionConstraint &&
+			    MinPositionConstraint is { } minPositionConstraint)
 			{
 				float result = minPositionConstraint + // TODO check validity
-				               (feedbackVoltage / (maxPositionConstraint - minPositionConstraint) * minPositionConstraint);
+				               (feedbackVoltage / (maxPositionConstraint - minPositionConstraint) *
+				                minPositionConstraint);
 
 				return Math.Clamp(result, MinPositionConstraint, MaxPositionConstraint);
 			}
@@ -46,26 +47,30 @@ namespace RoboPrinter.Core.Models
 			return null;
 		}
 	}
-	
-	public class ServoComparer : IEqualityComparer<Servo>   
+
+	public class ServoComparer : IEqualityComparer<Servo>
 	{
 		bool IEqualityComparer<Servo>.Equals(Servo x, Servo y)
 		{
 			if (x == null || y == null)
+			{
 				throw new ArgumentException("Object is null");
-			
-			return x.Id.Equals(y.Id) && 
-			       x.Position.Equals(y.Position) && 
+			}
+
+			return x.Id.Equals(y.Id) &&
+			       x.Position.Equals(y.Position) &&
 			       x.MinPositionConstraint.Equals(y.MinPositionConstraint) &&
-			       x.MaxPositionConstraint.Equals(y.MaxPositionConstraint);        
+			       x.MaxPositionConstraint.Equals(y.MaxPositionConstraint);
 		}
 
 		int IEqualityComparer<Servo>.GetHashCode(Servo obj)
 		{
-			if (Object.ReferenceEquals(obj, null))
-				return 0;               
+			if (ReferenceEquals(obj, null))
+			{
+				return 0;
+			}
 
-			return obj.Id.GetHashCode() + (int) obj.Position;       
+			return obj.Id.GetHashCode() + (int)obj.Position;
 		}
 	}
 }

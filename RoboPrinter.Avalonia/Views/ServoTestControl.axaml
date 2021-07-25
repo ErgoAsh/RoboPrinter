@@ -11,8 +11,8 @@
     <StackPanel>
         <DataGrid Name="TableGrid" IsReadOnly="True">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*"/>
-                
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*" />
+
                 <DataGridTemplateColumn Header="Slider" Width="3*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -20,8 +20,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
-                <DataGridTextColumn Header="Value" Binding="{Binding Position}"  Width="*"/>
+
+                <DataGridTextColumn Header="Value" Binding="{Binding Position}" Width="*" />
             </DataGrid.Columns>
 
         </DataGrid>

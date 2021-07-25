@@ -23,20 +23,6 @@ namespace RoboPrinter.Core.Models
 			SetupServos();
 		}
 
-		private void SetupServos()
-		{
-			for (short i = 0; i < 5; i++)
-			{
-				_servos.AddOrUpdate(new Servo
-				{
-					Id = i, 
-					Position = 90,
-					MinPositionConstraint = 60,
-					MaxPositionConstraint = 90
-				});
-			}
-		}
-
 		public Optional<Servo> GetServo(short id)
 		{
 			return _servos.Lookup(id);
@@ -78,5 +64,16 @@ namespace RoboPrinter.Core.Models
 		}
 
 		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange => _servos.Connect();
+
+		private void SetupServos()
+		{
+			for (short i = 0; i < 5; i++)
+			{
+				_servos.AddOrUpdate(new Servo
+				{
+					Id = i, Position = 90, MinPositionConstraint = 60, MaxPositionConstraint = 90
+				});
+			}
+		}
 	}
 }
