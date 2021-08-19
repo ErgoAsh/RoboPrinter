@@ -22,7 +22,7 @@ namespace RoboPrinter.Core.ViewModels
 		{
 			_servoService = servoService ?? Locator.Current.GetService<IServoService>();
 
-			UpdateRateMilliseconds = 500;
+			UpdateRateMilliseconds = 500; // Default value
 
 			Activator = new ViewModelActivator();
 			this.WhenActivated(disposable =>

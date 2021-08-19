@@ -37,7 +37,12 @@ void processIncomingByte(const byte input_byte) {
             input_line[input_position] = 0;  // terminating null byte
 
             // terminator reached process input_line here
-            servo.process_serial_data(input_line, input_position + 1);
+            if (input_line[0] == 'T') {
+                Serial1.println("T\n");
+                // TODO move to a separate function?
+            } else {
+                servo.process_serial_data(input_line, input_position + 1);
+            }
 
             // reset buffer for next time
             input_position = 0;

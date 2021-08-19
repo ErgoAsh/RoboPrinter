@@ -32,7 +32,6 @@ void ServoControl::set_servo_position(const short servo_number,
         return;            // TODO Return bool or throw error
 
     if (position < 0 || position > 180) return;
-    ;
 
     pwm_driver.setPWM(
         servo_number, 0,  // TODO save servo constants in servo structure

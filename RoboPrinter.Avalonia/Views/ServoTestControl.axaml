@@ -25,9 +25,19 @@
             </DataGrid.Columns>
 
         </DataGrid>
-        <StackPanel Orientation="Horizontal" Spacing="25" HorizontalAlignment="Center">
-            <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
-            <Button Name="UpdateButton">Update</Button>
+        <StackPanel Orientation="Vertical" 
+                    Spacing="10" 
+                    HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
+                <TextBox Name="UpdateRateTextBox"
+                         Margin="35,0,0,0"/>
+                <TextBlock Text="ms (update rate)" 
+                           VerticalAlignment="Center"
+                           Margin="10,0,0,0"/>
+            </StackPanel>
+            
+            <Button Name="UpdateButton" HorizontalAlignment="Center">Update</Button>
         </StackPanel>
     </StackPanel>
 </reactiveUi:ReactiveUserControl>
