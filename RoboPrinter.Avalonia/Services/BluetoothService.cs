@@ -3,10 +3,15 @@ using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Foundation;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 
@@ -32,7 +37,7 @@ namespace RoboPrinter.Avalonia.Services
 			_dataReceived = new Subject<string>();
 			_devices = new SourceCache<BluetoothDevice, string>(device => device.Id);
 
-			InitializeWatcher();
+			//InitializeWatcher();
 		}
 
 		[Reactive]
@@ -44,9 +49,15 @@ namespace RoboPrinter.Avalonia.Services
 
 		public async void Connect(BluetoothDevice device, Action onCompleted, Action<Exception> onError)
 		{
+			if (_socket != null)
+			{
+				onCompleted.Invoke();
+				return;
+			}
+
 			// Initialize the target Bluetooth BR device
-			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(
-				device.Id + "#RFCOMM:00000000:{" + RfcommServiceId.SerialPort.Uuid + "}");
+			string id = device.Id + "#RFCOMM:00000000:{" + RfcommServiceId.SerialPort.Uuid + "}";
+			RfcommDeviceService service = await RfcommDeviceService.FromIdAsync(id);
 
 			// Check that the service meets this App's minimum requirement
 			if (!SupportsProtection(service))
@@ -62,7 +73,7 @@ namespace RoboPrinter.Avalonia.Services
 				await _socket.ConnectAsync(
 					_service.ConnectionHostName,
 					_service.ConnectionServiceName,
-					SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication
+					SocketProtectionLevel.PlainSocket
 				);
 
 				_writer = new DataWriter(_socket.OutputStream);
@@ -71,6 +82,8 @@ namespace RoboPrinter.Avalonia.Services
 				device.IsConnected = true;
 				_devices.AddOrUpdate(device);
 
+				ReadFeedbackRecursive();
+				
 				onCompleted.Invoke();
 			}
 			catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND
@@ -99,7 +112,10 @@ namespace RoboPrinter.Avalonia.Services
 				//	"[BluetoothService::SendPosition] Connection has not been established yet");
 			}
 
-			// If not ends with \n, add one
+			if (data[^1] != '\n')
+			{
+				data += '\n';
+			}
 
 			_writer.WriteString(data);
 
@@ -113,6 +129,9 @@ namespace RoboPrinter.Avalonia.Services
 			Action<int> onCompleted,
 			Action<Exception> onError)
 		{
+			if (device.IsCorrupted())
+				return;
+
 			// TODO use timeoutSeconds
 			IsTestInProgress = true;
 
@@ -162,7 +181,7 @@ namespace RoboPrinter.Avalonia.Services
 			_service?.Dispose();
 		}
 
-		private void InitializeWatcher()
+		public void InitializeWatcher()
 		{
 			string[] requestedProperties = {"System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected"};
 
@@ -213,25 +232,27 @@ namespace RoboPrinter.Avalonia.Services
 		{
 			try
 			{
-				uint size = await _reader.LoadAsync(sizeof(uint));
-				if (size < sizeof(uint))
+				_reader.InputStreamOptions = InputStreamOptions.Partial;
+				while (true)
 				{
-					// "Remote device terminated connection - make sure only one instance
-					// of server is running on remote device"
-					return;
+					await _reader.LoadAsync(8192);
+					var size = _reader.ReadUInt32();
+
+					await _reader.LoadAsync( size );
+					byte[] bytes = new byte[size];
+					_reader.ReadBytes( bytes );
+					
+					
 				}
-
-				uint stringLength = _reader.ReadUInt32();
-				uint actualStringLength = await _reader.LoadAsync(stringLength);
-				if (actualStringLength != stringLength)
-				{
-					// The underlying socket was closed before we were able to read the whole data
-					return;
-				}
-
-				_dataReceived.OnNext(size.ToString());
-
-				//ReceiveStringLoop(chatReader);
+				
+				StringBuilder builder = new();
+				builder.Append(_reader.ReadByte());
+				
+				if (builder.ToString() != "T")
+					builder.Append(_reader.ReadSingle());
+				
+				_dataReceived.OnNext(builder.ToString());
+				
 				ReadFeedbackRecursive();
 			}
 			catch (Exception ex)

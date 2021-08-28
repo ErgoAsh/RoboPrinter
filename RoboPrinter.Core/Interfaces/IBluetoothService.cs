@@ -12,6 +12,8 @@ namespace RoboPrinter.Core.Interfaces
 		public void Disconnect();
 		public void Connect(BluetoothDevice device, Action onCompleted, Action<Exception> onError);
 
+		public void InitializeWatcher();
+		
 		public void TestConnection(
 			BluetoothDevice device,
 			TimeSpan timeout,

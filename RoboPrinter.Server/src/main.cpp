@@ -1,21 +1,27 @@
 #include <Wire.h>
 
 #include "servo_control.h"
+#include "BluetoothSerial.h"
+
+// Check if Bluetooth configurations are enabled in the SDK 
+// If not, then you have to recompile the SDK 
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
 
 void processIncomingByte(const byte input_byte);
 
 namespace constants {
-
-// Maximum length of input of Bluetooth transmission
-static const unsigned int bluetooth_max_input = 16;
-
-}  // namespace constants
+    // Maximum length of input of Bluetooth transmission
+    static const unsigned int bluetooth_max_input = 16;
+}
 
 static auto servo = ServoControl();
+static BluetoothSerial SerialBT = BluetoothSerial();
 
 void setup() {
-    Serial.begin(9600);   // Serial monitor for USB debugging
-    Serial1.begin(9600);  // Arduino Nano Every UART
+    Serial.begin(115200);   // Serial monitor for USB debugging
+    SerialBT.begin("RoboPrinter.Board");
 
     servo.initialize();
 
@@ -23,8 +29,8 @@ void setup() {
 }
 
 void loop() {
-    if (Serial1.available() > 0) {
-        processIncomingByte(Serial1.read());
+    if (SerialBT.available() > 0) {
+        processIncomingByte(SerialBT.read());
     }
 }
 
@@ -38,8 +44,8 @@ void processIncomingByte(const byte input_byte) {
 
             // terminator reached process input_line here
             if (input_line[0] == 'T') {
-                Serial1.println("T\n");
-                // TODO move to a separate function?
+                SerialBT.println("T");
+                Serial.println("T");
             } else {
                 servo.process_serial_data(input_line, input_position + 1);
             }

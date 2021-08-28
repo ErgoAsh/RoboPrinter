@@ -13,5 +13,10 @@ namespace RoboPrinter.Core.Models
 
 		[Reactive]
 		public bool IsConnected { get; set; }
+
+		public bool IsCorrupted()
+		{
+			return string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(Name);
+		}
 	}
 }
