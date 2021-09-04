@@ -1,3 +1,9 @@
 {
-    "cSpell.words": ["USMAX", "USMIN", "println", "servonum"]
+    "cSpell.words": [
+        "USMAX",
+        "USMIN",
+        "println",
+        "servonum"
+    ],
+    "git.ignoreLimitWarning": true
 }

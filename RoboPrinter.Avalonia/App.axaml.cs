@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using RoboPrinter.Avalonia.Services;
 using RoboPrinter.Avalonia.Views;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;

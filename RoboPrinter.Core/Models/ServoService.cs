@@ -43,7 +43,7 @@ namespace RoboPrinter.Core.Models
 			}
 		}
 
-		public void SendPosition(short id, float position)
+		public async void SendPosition(short id, float position)
 		{
 			if (id is < 0 or > 5)
 			{
@@ -60,7 +60,10 @@ namespace RoboPrinter.Core.Models
 				.Append(position)
 				.Append('\n');
 
-			_bluetoothService.SendData(stringBuilder.ToString());
+			await _bluetoothService.SendDataAsync(stringBuilder.ToString(), (error) =>
+			{
+				// TODO print error
+			});
 		}
 
 		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange => _servos.Connect();

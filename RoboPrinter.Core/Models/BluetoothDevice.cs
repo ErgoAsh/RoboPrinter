@@ -3,6 +3,13 @@ using ReactiveUI.Fody.Helpers;
 
 namespace RoboPrinter.Core.Models
 {
+	public enum BluetoothState
+	{
+		Unpaired,
+		Paired,
+		Connected
+	}
+	
 	public class BluetoothDevice : ReactiveObject
 	{
 		[Reactive]
@@ -12,7 +19,7 @@ namespace RoboPrinter.Core.Models
 		public string Name { get; set; }
 
 		[Reactive]
-		public bool IsConnected { get; set; }
+		public BluetoothState State { get; set; }
 
 		public bool IsCorrupted()
 		{

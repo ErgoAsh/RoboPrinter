@@ -10,6 +10,7 @@
 #endif
 
 void processIncomingByte(const byte input_byte);
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
 
 namespace constants {
     // Maximum length of input of Bluetooth transmission
@@ -21,7 +22,15 @@ static BluetoothSerial SerialBT = BluetoothSerial();
 
 void setup() {
     Serial.begin(115200);   // Serial monitor for USB debugging
-    SerialBT.begin("RoboPrinter.Board");
+
+    SerialBT.setPin("1234");
+    SerialBT.register_callback(callback);
+
+    if (!SerialBT.begin("RoboPrinter.Board")) {
+        Serial.println("An error occurred initializing Bluetooth");
+    } else {
+        Serial.println("Bluetooth initialized");
+    }
 
     servo.initialize();
 
@@ -63,5 +72,12 @@ void processIncomingByte(const byte input_byte) {
                 input_line[input_position++] = input_byte;
             }
             break;
+    }
+}
+
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param) {
+    if (event == ESP_SPP_SRV_OPEN_EVT){
+        Serial.println("Client Connected");
+        SerialBT.println("M_BT_CONNECTED");
     }
 }

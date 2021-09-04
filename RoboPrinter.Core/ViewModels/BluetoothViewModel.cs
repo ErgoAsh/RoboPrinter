@@ -27,7 +27,7 @@ namespace RoboPrinter.Core.ViewModels
 			{
 				Items = new ObservableCollectionExtended<BluetoothDevice>();
 
-				_bluetoothService.InitializeWatcher();
+				_bluetoothService.DiscoverDevices();
 				
 				_bluetoothService.BluetoothDeviceCollectionChange
 					.AsObservable()
@@ -38,15 +38,12 @@ namespace RoboPrinter.Core.ViewModels
 
 			ConnectCommand = ReactiveCommand.Create(() =>
 			{
-				_bluetoothService.Connect(SelectedItem, () => { }, error =>
-				{
-					// TODO show error tip
-				});
+				_bluetoothService.Connect(SelectedItem); // TODO Handle error?
 			});
 
 			TestConnectionCommand = ReactiveCommand.Create(() =>
 			{
-				_bluetoothService.TestConnection(SelectedItem, TimeSpan.FromSeconds(5), 
+				_bluetoothService.TestResponseTime(TimeSpan.FromSeconds(5), 
 					time =>
 					{
 						LastPingMilliseconds = time;
@@ -63,7 +60,7 @@ namespace RoboPrinter.Core.ViewModels
 		public BluetoothDevice SelectedItem { get; set; }
 
 		[Reactive]
-		public int? LastPingMilliseconds { get; set; }
+		public long? LastPingMilliseconds { get; set; }
 		
 		[Reactive]
 		public string ConnectionError { get; set; }
