@@ -19,7 +19,7 @@ namespace RoboPrinter.Avalonia
 				return (Control)Activator.CreateInstance(type)!;
 			}
 
-			return new TextBlock {Text = "Not Found: " + name};
+			return new TextBlock { Text = "Not Found: " + name };
 		}
 
 		public bool Match(object data)

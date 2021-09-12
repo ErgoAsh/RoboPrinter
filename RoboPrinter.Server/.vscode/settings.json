@@ -1,9 +1,13 @@
 {
     "cSpell.words": [
-        "USMAX",
-        "USMIN",
+        "gatts",
+        "GPIO",
+        "OLED",
         "println",
-        "servonum"
+        "servonum",
+        "SWITCHCAPVCC",
+        "USMAX",
+        "USMIN"
     ],
     "git.ignoreLimitWarning": true
 }

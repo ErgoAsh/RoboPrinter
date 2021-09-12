@@ -25,12 +25,13 @@ namespace RoboPrinter.Core.ViewModels
 			Activator = new ViewModelActivator();
 			this.WhenActivated(disposable =>
 			{
-				Items = new ObservableCollectionExtended<BluetoothDevice>();
+				Items = new ObservableCollectionExtended<BleServiceItem>();
 
-				_bluetoothService.DiscoverDevices();
+				_bluetoothService.StartDeviceDiscovery();
 				
 				_bluetoothService.BluetoothDeviceCollectionChange
 					.AsObservable()
+					.ObserveOn(RxApp.MainThreadScheduler)
 					.Bind(Items)
 					.Subscribe()
 					.DisposeWith(disposable);
@@ -57,7 +58,7 @@ namespace RoboPrinter.Core.ViewModels
 		}
 
 		[Reactive]
-		public BluetoothDevice SelectedItem { get; set; }
+		public BleServiceItem SelectedItem { get; set; }
 
 		[Reactive]
 		public long? LastPingMilliseconds { get; set; }
@@ -65,7 +66,7 @@ namespace RoboPrinter.Core.ViewModels
 		[Reactive]
 		public string ConnectionError { get; set; }
 
-		public ObservableCollectionExtended<BluetoothDevice> Items { get; private set; }
+		public ObservableCollectionExtended<BleServiceItem> Items { get; private set; }
 
 		public ReactiveCommand<Unit, Unit> TestConnectionCommand { get; }
 		public ReactiveCommand<Unit, Unit> ConnectCommand { get; }

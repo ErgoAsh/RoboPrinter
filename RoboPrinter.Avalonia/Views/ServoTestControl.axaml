@@ -25,18 +25,18 @@
             </DataGrid.Columns>
 
         </DataGrid>
-        <StackPanel Orientation="Vertical" 
-                    Spacing="10" 
+        <StackPanel Orientation="Vertical"
+                    Spacing="10"
                     HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
                 <TextBox Name="UpdateRateTextBox"
-                         Margin="35,0,0,0"/>
-                <TextBlock Text="ms (update rate)" 
+                         Margin="35,0,0,0" />
+                <TextBlock Text="ms (update rate)"
                            VerticalAlignment="Center"
-                           Margin="10,0,0,0"/>
+                           Margin="10,0,0,0" />
             </StackPanel>
-            
+
             <Button Name="UpdateButton" HorizontalAlignment="Center">Update</Button>
         </StackPanel>
     </StackPanel>

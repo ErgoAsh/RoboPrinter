@@ -19,8 +19,10 @@ void ServoControl::process_serial_data(const char* data, const short length) {
     short id_number = data[0] - 65;
     float position = atof(data + 1);
 
-    Serial.println(id_number);
-    Serial.println(position);
+    Serial.print(id_number);
+    Serial.print(": ");
+    Serial.print(position);
+    Serial.println();
 
     set_servo_position(id_number, position);
 }

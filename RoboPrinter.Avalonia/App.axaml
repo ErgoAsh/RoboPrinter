@@ -5,7 +5,7 @@
     <Application.DataTemplates>
         <local:ViewLocator />
     </Application.DataTemplates>
-    
+
     <!-- <Application.Resources> -->
     <!--     <SolidColorBrush x:Key="DataGridFillerGridLinesBrush" -->
     <!--                      Color="Transparent" /> -->

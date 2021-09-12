@@ -45,7 +45,7 @@ namespace RoboPrinter.Core.Models
 
 		public async void SendPosition(short id, float position)
 		{
-			if (id is < 0 or > 5)
+			if (id is < 0 or > 3)
 			{
 				return; // TODO throw new exception, read 5 from somewhere
 			}

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using RoboPrinter.Avalonia.Services;
 using RoboPrinter.Avalonia.Views;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
@@ -14,15 +15,18 @@ namespace RoboPrinter.Avalonia
 		{
 			AvaloniaXamlLoader.Load(this);
 
-			BluetoothService? bluetoothService = new();
-			Locator.CurrentMutable.RegisterLazySingleton(() => bluetoothService, typeof(IBluetoothService));
-			Locator.CurrentMutable.RegisterLazySingleton(() => new ServoService(bluetoothService),
+			AvaloniaBluetoothService? bluetoothService = new();
+			Locator.CurrentMutable.RegisterLazySingleton(() => bluetoothService,
+				typeof(IBluetoothService));
+			Locator.CurrentMutable.RegisterLazySingleton(
+				() => new ServoService(bluetoothService),
 				typeof(IServoService));
 		}
 
 		public override void OnFrameworkInitializationCompleted()
 		{
-			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
+				desktop)
 			{
 				desktop.MainWindow = new MainWindow();
 			}

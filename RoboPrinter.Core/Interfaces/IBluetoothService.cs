@@ -12,14 +12,17 @@ namespace RoboPrinter.Core.Interfaces
 	{
 		IObservable<string> DataReceived { get; }
 		IObservable<string> DataSent { get; }
-		IObservable<IChangeSet<BluetoothDevice, string>> BluetoothDeviceCollectionChange { get; }
+		IObservable<IChangeSet<BleServiceItem, string>> BluetoothDeviceCollectionChange { get; }
 		bool IsTestInProgress { get; set; }
+		bool IsScanningInProgress { get; set; }
+		bool IsConnectionInProgress { get; set; }
 		
-		void Connect(BluetoothDevice device);
+		void Connect(BleServiceItem item);
 		void Disconnect();
-		void DiscoverDevices();
+		void StartDeviceDiscovery();
+		void StopDeviceDiscovery();
 		
 		void TestResponseTime(TimeSpan timeout, Action<long> onCompleted, Action<Exception> onError);
-		ValueTask SendDataAsync(string data, Action<Exception> onError, CancellationToken token = default);
+		Task SendDataAsync(string data, Action<Exception> onError, CancellationToken token = default);
 	}
 }
