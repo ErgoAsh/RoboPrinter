@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Adafruit_PWMServoDriver.h>
+#include "display_control.h"
 
 namespace constants {
 // This is the 'minimum' pulse length count (out of 4096)
@@ -29,11 +30,12 @@ struct Servo {
 
 class ServoControl {
    private:
-    Adafruit_PWMServoDriver pwm_driver;
+    Adafruit_PWMServoDriver _pwm_driver;
+    DisplayControl* _display_control;
 
    public:
-    ServoControl();
+    ServoControl(DisplayControl* display_control);
     void initialize();
-    void process_serial_data(const char* data, const short length);
+    void process_data(const std::string&, const short length);
     void set_servo_position(const short number, const float position);
 };

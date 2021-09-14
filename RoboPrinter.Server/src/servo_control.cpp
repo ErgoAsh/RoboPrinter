@@ -1,30 +1,52 @@
 #include "servo_control.h"
 
 #include <Arduino.h>
-#include <stdlib.h>
 
-ServoControl::ServoControl() { pwm_driver = Adafruit_PWMServoDriver(); }
+#include <stdlib.h>
+#include <cstring>
+#include <string>
+
+ServoControl::ServoControl(DisplayControl* display_control) { 
+    _display_control = display_control;
+    _pwm_driver = Adafruit_PWMServoDriver(); 
+}
 
 void ServoControl::initialize() {
-    pwm_driver.begin();  // TODO adjust values
-    pwm_driver.setOscillatorFrequency(27000000);
-    pwm_driver.setPWMFreq(
+    _pwm_driver.begin();
+    _pwm_driver.setOscillatorFrequency(27000000); // TODO adjust values
+    _pwm_driver.setPWMFreq(
         constants::servo_freq);  // Analog servos run at ~50 Hz updates
 }
 
-void ServoControl::process_serial_data(const char* data, const short length) {
-    if (data == NULL) return;  // TODO return bool
-    if (length < 0) return;
+void ServoControl::process_data(const std::string& data, const short length) {
+    if (data.empty() || length != 20) {
+        Serial.println("Data parsing issue");
+        return;
+    }
 
-    short id_number = data[0] - 65;
-    float position = atof(data + 1);
+    uint32_t values[5];
+    for (int i = 0; i < length; i += 4) {
+        uint32_t number;  // float binary representation (IEEE 754)
+                          // 4 bytes per one float (32 bits in total)
 
-    Serial.print(id_number);
-    Serial.print(": ");
-    Serial.print(position);
+        for (int j = i; j < i + 4; j++) {
+            number = (number << 8) + data[j];  // Append one byte to the number
+        }
+        values[i] = number;
+
+        float position;
+        std::memcpy(&position, &number, sizeof(position));
+
+        set_servo_position(i / 4, position);
+
+        Serial.print(i / 4);
+        Serial.print(": ");
+        Serial.print(position);
+        Serial.println();
+    }
     Serial.println();
-
-    set_servo_position(id_number, position);
+    
+    _display_control->display_servo_values(values, 5);
 }
 
 void ServoControl::set_servo_position(const short servo_number,
@@ -35,7 +57,7 @@ void ServoControl::set_servo_position(const short servo_number,
 
     if (position < 0 || position > 180) return;
 
-    pwm_driver.setPWM(
+    _pwm_driver.setPWM(
         servo_number, 0,  // TODO save servo constants in servo structure
         map(position, 0, 180, constants::servo_min, constants::servo_max));
 }
