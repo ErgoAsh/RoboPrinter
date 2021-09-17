@@ -1,36 +1,52 @@
 #include <Arduino.h>
+#include <servo_service.h>
 #include <unity.h>
+#include <iostream>
 
-// void setUp(void) {
-// // set stuff up here
-// }
+static ServoService service = ServoService(nullptr);
+static std::string correct_data;
+static std::array<float, 5> empty_array = { };
 
-// void tearDown(void) {
-// // clean stuff up here
-// }
-
-void setup() {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    delay(2000);
-
-    UNITY_BEGIN();  // IMPORTANT LINE!
-    // RUN_TEST(test_led_builtin_pin_number);
-
-    pinMode(LED_BUILTIN, OUTPUT);
+void test_null_data_parse() {
+    TEST_ASSERT(empty_array == service.parse_data(nullptr, 20));
 }
 
-uint8_t i = 0;
-uint8_t max_blinks = 5;
+void test_empty_data_parse() {
+    const std::string data = {};
+    TEST_ASSERT(empty_array == service.parse_data(data, 20));
+}
+
+void test_invalid_length_parse() {
+    TEST_ASSERT(empty_array == service.parse_data(correct_data, 5));
+}
+
+void test_valid_parse() {
+    std::array<float, 5> array = { 2137.0f, 2137.0f, 2137.0f, 2137.0f, 2137.0f };
+    TEST_ASSERT(array == service.parse_data(correct_data, 20));
+}
+ 
+void setup() {
+    delay(2000);
+
+    uint32_t number = 0x45059000;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 4; j++) {
+            uint32_t mask = 0xFF << j * 8;
+            uint32_t content = content & mask;
+            char symbol = content >> j * 8;
+            correct_data.push_back(symbol);
+        }
+    }
+    std::cout << correct_data;
+
+    UNITY_BEGIN();
+    RUN_TEST(test_null_data_parse);
+    RUN_TEST(test_empty_data_parse);
+    RUN_TEST(test_invalid_length_parse);
+    RUN_TEST(test_valid_parse);
+    UNITY_END();
+}
 
 void loop() {
-    if (i < max_blinks) {
-        // RUN_TEST(test_led_state_high);
-        delay(500);
-        // RUN_TEST(test_led_state_low);
-        delay(500);
-        i++;
-    } else if (i == max_blinks) {
-        UNITY_END();  // stop unit testing
-    }
+
 }

@@ -14,13 +14,16 @@ using System.Reactive.Linq;
 
 namespace RoboPrinter.Core.ViewModels
 {
-	public class ServoTestViewModel : ReactiveObject, IActivatableViewModel // TODO add ILockable
+	public class
+		ServoTestViewModel : ReactiveObject,
+			IActivatableViewModel // TODO add ILockable
 	{
 		private readonly IServoService _servoService;
 
 		public ServoTestViewModel(IServoService servoService = null)
 		{
-			_servoService = servoService ?? Locator.Current.GetService<IServoService>();
+			_servoService = servoService ??
+			                Locator.Current.GetService<IServoService>();
 
 			UpdateRateMilliseconds = 500; // Default value
 
@@ -31,7 +34,8 @@ namespace RoboPrinter.Core.ViewModels
 				PositionsCache = new List<KeyValuePair<short, float>>();
 
 				_servoService.ServoCollectionChange
-					.Sort(SortExpressionComparer<Servo>.Ascending(item => item.Id))
+					.Sort(SortExpressionComparer<Servo>.Ascending(item =>
+						item.Id))
 					.Bind(Items)
 					.Subscribe()
 					.DisposeWith(disposable);
@@ -43,25 +47,32 @@ namespace RoboPrinter.Core.ViewModels
 					{
 						if (IsUpdatingContinuously)
 						{
-							IEnumerable<KeyValuePair<short, float>> positionsToUpdate;
+							IEnumerable<KeyValuePair<short, float>>
+								positionsToUpdate;
 							if (PositionsCache.Count == 0)
 							{
-								positionsToUpdate = PositionsCache.AsEnumerable();
+								positionsToUpdate =
+									PositionsCache.AsEnumerable();
 							}
 							else
 							{
 								positionsToUpdate = Items
-									.Select(x => new KeyValuePair<short, float>(x.Id, x.Position))
+									.Select(x =>
+										new KeyValuePair<short, float>(x.Id,
+											x.Position))
 									.Except(PositionsCache);
 							}
 
-							PositionsCache = new List<KeyValuePair<short, float>>(
-								Items.Select(x => new KeyValuePair<short, float>(x.Id, x.Position)));
+							PositionsCache =
+								new List<KeyValuePair<short, float>>(
+									Items.Select(x =>
+										new KeyValuePair<short, float>(x.Id,
+											x.Position)));
 
-							foreach (KeyValuePair<short, float> item in positionsToUpdate)
-							{
-								_servoService.SendPosition(item.Key, item.Value);
-							}
+							//foreach (KeyValuePair<short, float> item in positionsToUpdate)
+							//{
+							_servoService.SendPositions();
+							//}
 						}
 					})
 					.DisposeWith(disposable);

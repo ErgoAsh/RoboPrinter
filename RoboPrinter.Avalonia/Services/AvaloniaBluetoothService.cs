@@ -5,8 +5,10 @@ using ReactiveUI.Fody.Helpers;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
@@ -175,13 +177,19 @@ namespace RoboPrinter.Avalonia.Services
 			throw new NotImplementedException();
 		}
 
-		public Task SendDataAsync(string data, Action<Exception> onError,
+		public Task SendDataAsync(byte[] data, Action<Exception> onError,
 			CancellationToken token = default)
 		{
-			if (string.IsNullOrEmpty(data))
+			// if (data == null || data.em)
+			// {
+			// 	return Task.FromException(new ArgumentNullException(data,
+			// 		"No data has been provided"));
+			// }
+			
+			if (data.Length != 20)
 			{
-				return Task.FromException(new InvalidOperationException(
-					"No data has been provided"));
+				//return Task.FromException(new ArgumentOutOfRangeException(data,
+				//	"Data length is invalid"));
 			}
 
 			if (_isConnected == false || _positionCharacteristic == null)
@@ -192,13 +200,8 @@ namespace RoboPrinter.Avalonia.Services
 
 			try
 			{
-				if (data[^1] != '\n')
-				{
-					data += '\n';
-				}
-
 				DataWriter writer = new();
-				writer.WriteString(data);
+				writer.WriteBytes(data);
 
 				return _positionCharacteristic.WriteValueAsync(
 					writer.DetachBuffer(),

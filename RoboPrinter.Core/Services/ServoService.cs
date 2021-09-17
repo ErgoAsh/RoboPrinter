@@ -6,6 +6,7 @@ using RoboPrinter.Core.Interfaces;
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RoboPrinter.Core.Models
@@ -17,7 +18,8 @@ namespace RoboPrinter.Core.Models
 
 		public ServoService(IBluetoothService bluetoothService)
 		{
-			_bluetoothService = bluetoothService ?? Locator.Current.GetService<IBluetoothService>();
+			_bluetoothService = bluetoothService ??
+			                    Locator.Current.GetService<IBluetoothService>();
 
 			_servos = new SourceCache<Servo, short>(item => item.Id);
 			SetupServos();
@@ -31,42 +33,35 @@ namespace RoboPrinter.Core.Models
 		public void UpdateServo(Servo servo)
 		{
 			_servos.AddOrUpdate(servo);
-			SendPosition(servo.Id, servo.Position);
+			//SendPosition(servo.Id, servo.Position);
 		}
 
 		public void UpdateServos(IEnumerable<Servo> servos)
 		{
 			_servos.AddOrUpdate(servos);
-			foreach (Servo servo in servos)
-			{
-				SendPosition(servo.Id, servo.Position);
-			}
+			//foreach (Servo servo in servos)
+			//{
+			SendPositions();
+			//}
 		}
 
-		public async void SendPosition(short id, float position)
+		public async void SendPositions()
 		{
-			if (id is < 0 or > 3)
-			{
-				return; // TODO throw new exception, read 5 from somewhere
-			}
+			// TODO check servo array length
+			var bytes = _servos.Items
+				.Select(item => item.Position)
+				.Select(item => BitConverter.GetBytes(item).Reverse())
+				.SelectMany(item => item)
+				.ToArray();
 
-			if (position is < 0 or > 180) // TODO change to support 360 deg servo
-			{
-				return;
-			}
-
-			StringBuilder stringBuilder = new StringBuilder()
-				.Append((char)(id + 65))
-				.Append(position)
-				.Append('\n');
-
-			await _bluetoothService.SendDataAsync(stringBuilder.ToString(), (error) =>
+			await _bluetoothService.SendDataAsync(bytes, error =>
 			{
 				// TODO print error
 			});
 		}
 
-		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange => _servos.Connect();
+		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange =>
+			_servos.Connect();
 
 		private void SetupServos()
 		{
@@ -74,7 +69,10 @@ namespace RoboPrinter.Core.Models
 			{
 				_servos.AddOrUpdate(new Servo
 				{
-					Id = i, Position = 90, MinPositionConstraint = 60, MaxPositionConstraint = 90
+					Id = i,
+					Position = 90,
+					MinPositionConstraint = 60,
+					MaxPositionConstraint = 90
 				});
 			}
 		}

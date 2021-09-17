@@ -15,6 +15,6 @@ namespace RoboPrinter.Core.Interfaces
 		public void UpdateServo(Servo servo);
 		public void UpdateServos(IEnumerable<Servo> servos);
 
-		public void SendPosition(short id, float position);
+		public void SendPositions();
 	}
 }

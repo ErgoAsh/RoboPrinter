@@ -1,24 +1,26 @@
-#include "servo_control.h"
-#include "bluetooth_control.h"
-#include "display_control.h"
+#include <servo_service.h>
+#include <bluetooth_service.h>
+#include <display_service.h>
 
-static auto display_control = DisplayControl();
-static auto servo_control = ServoControl(&display_control);
-static auto bluetooth_control = BluetoothControl(&servo_control);
+static auto display_service = DisplayService();
+static auto servo_service = ServoService(&display_service);
+static auto bluetooth_service = BluetoothService(&servo_service);
 
+#ifndef UNIT_TEST
 void setup() {
     // Initialize serial monitor for USB debugging
     Serial.begin(115200);
 
-    display_control.initialize();
-    servo_control.initialize();
-    bluetooth_control.initialize();
+    display_service.initialize();
+    servo_service.initialize();
+    bluetooth_service.initialize();
 
     delay(10);
 }
 
 void loop() {
-    bluetooth_control.on_loop();
+    bluetooth_service.on_loop();
 
     delay(100);
 }
+#endif

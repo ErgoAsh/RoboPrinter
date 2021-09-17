@@ -23,6 +23,6 @@ namespace RoboPrinter.Core.Interfaces
 		void StopDeviceDiscovery();
 		
 		void TestResponseTime(TimeSpan timeout, Action<long> onCompleted, Action<Exception> onError);
-		Task SendDataAsync(string data, Action<Exception> onError, CancellationToken token = default);
+		Task SendDataAsync(byte[] data, Action<Exception> onError, CancellationToken token = default);
 	}
 }

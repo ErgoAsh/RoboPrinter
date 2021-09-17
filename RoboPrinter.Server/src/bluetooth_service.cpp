@@ -1,17 +1,17 @@
-#include "bluetooth_control.h"
+#include <bluetooth_service.h>
 
 #include <Arduino.h>
 
-CustomServerCallbacks::CustomServerCallbacks(BluetoothControl* control) {
-    _control = control;
+CustomServerCallbacks::CustomServerCallbacks(BluetoothService* service) {
+    _service = service;
 }
 
 void CustomServerCallbacks::onConnect(BLEServer* ble_server) {
-    _control->central_connected = true;
+    _service->central_connected = true;
 }
 
 void CustomServerCallbacks::onDisconnect(BLEServer* ble_server) {
-    _control->central_connected = false;
+    _service->central_connected = false;
 }
 
 void CustomServerCallbacks::onMtuChanged(BLEServer* pServer,
@@ -21,8 +21,8 @@ void CustomServerCallbacks::onMtuChanged(BLEServer* pServer,
     Serial.println();
 }
 
-CustomResponseCallbacks::CustomResponseCallbacks(ServoControl* servo_control) {
-    _servo_control = servo_control;
+CustomResponseCallbacks::CustomResponseCallbacks(ServoService* servo_service) {
+    _servo_service = servo_service;
 }
 
 void CustomResponseCallbacks::onWrite(BLECharacteristic* characteristic,
@@ -34,14 +34,14 @@ void CustomResponseCallbacks::onWrite(BLECharacteristic* characteristic,
     Serial.print(input_data);
     Serial.println();
 
-    _servo_control->process_data(characteristic->getValue(), length);
+    _servo_service->process_data(characteristic->getValue(), length);
 }
 
-BluetoothControl::BluetoothControl(ServoControl* servo_control) {
-    _servo_control = servo_control;
+BluetoothService::BluetoothService(ServoService* servo_service) {
+    _servo_service = servo_service;
 }
 
-void BluetoothControl::initialize() {
+void BluetoothService::initialize() {
     // Initialize BLE
     BLEDevice::init("RoboPrinter.Board");
     ble_server = BLEDevice::createServer();
@@ -61,7 +61,7 @@ void BluetoothControl::initialize() {
     position_characteristic = ble_service->createCharacteristic(
         constants::position_uuid, position_flags);
     position_characteristic->setCallbacks(
-        new CustomResponseCallbacks(_servo_control));
+        new CustomResponseCallbacks(_servo_service));
 
     ble_service->start();
 
@@ -75,7 +75,7 @@ void BluetoothControl::initialize() {
     Serial.println("BLE setup done. Advertising the device...");
 }
 
-void BluetoothControl::on_loop() {
+void BluetoothService::on_loop() {
     // Disconnecting
     if (!central_connected && old_central_connected) {
         delay(500);  // give the bluetooth stack the chance to get
