@@ -31,7 +31,7 @@ void DisplayService::display_servo_values(std::array<float, 5> values) {
         driver.print("TH");
         driver.print(i);
         driver.print(": ");
-        driver.print(values[i]);`
+        driver.print(values[i]);
         driver.println();
     }
 

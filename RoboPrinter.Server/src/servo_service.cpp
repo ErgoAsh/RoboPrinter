@@ -13,7 +13,7 @@ ServoService::ServoService(DisplayService* display_service) {
 
 void ServoService::initialize() {
     _pwm_driver.begin();
-    _pwm_driver.setOscillatorFrequency(27000000);  // TODO adjust values
+    //_pwm_driver.setOscillatorFrequency(27000000);  // TODO adjust values
     _pwm_driver.setPWMFreq(
         constants::servo_freq);  // Analog servos run at ~50 Hz updates
 }
@@ -56,7 +56,7 @@ void ServoService::process_data(const std::string& data, const short length) {
     std::array<float, 5> values = parse_data(data, length);
 
     for (int i = 0; i < 5; i++) {
-        set_servo_position(i / 4, values[i]);
+        set_servo_position(i, values[i]);
     }
 
     if (_display_service != nullptr) {

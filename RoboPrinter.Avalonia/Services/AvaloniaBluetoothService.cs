@@ -63,6 +63,9 @@ namespace RoboPrinter.Avalonia.Services
 					await BluetoothLEDevice.FromBluetoothAddressAsync(
 						btAdv.BluetoothAddress);
 
+				if (device == null)
+					return;
+
 				_devices.AddOrUpdate(new BleServiceItem
 				{
 					ServerId = device.DeviceId,
