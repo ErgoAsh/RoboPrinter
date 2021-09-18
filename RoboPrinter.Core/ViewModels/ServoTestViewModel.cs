@@ -40,6 +40,7 @@ namespace RoboPrinter.Core.ViewModels
 					.Subscribe()
 					.DisposeWith(disposable);
 
+				//TODO update using: https://stackoverflow.com/a/33470045
 				Observable
 					.Interval(TimeSpan.FromMilliseconds(UpdateRateMilliseconds))
 					.ObserveOn(RxApp.MainThreadScheduler)
@@ -47,32 +48,7 @@ namespace RoboPrinter.Core.ViewModels
 					{
 						if (IsUpdatingContinuously)
 						{
-							IEnumerable<KeyValuePair<short, float>>
-								positionsToUpdate;
-							if (PositionsCache.Count == 0)
-							{
-								positionsToUpdate =
-									PositionsCache.AsEnumerable();
-							}
-							else
-							{
-								positionsToUpdate = Items
-									.Select(x =>
-										new KeyValuePair<short, float>(x.Id,
-											x.Position))
-									.Except(PositionsCache);
-							}
-
-							PositionsCache =
-								new List<KeyValuePair<short, float>>(
-									Items.Select(x =>
-										new KeyValuePair<short, float>(x.Id,
-											x.Position)));
-
-							//foreach (KeyValuePair<short, float> item in positionsToUpdate)
-							//{
 							_servoService.SendPositions();
-							//}
 						}
 					})
 					.DisposeWith(disposable);

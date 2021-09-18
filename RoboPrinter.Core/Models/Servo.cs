@@ -12,9 +12,47 @@ namespace RoboPrinter.Core.Models
 		[Reactive]
 		public short Id { get; init; }
 
+		/**
+		 * <summary>
+		 * Z-axis offset length. Denavit-Hartenberg parameter denoted as <c>d</c>
+		 * </summary>
+		 */
 		[Reactive]
-		public float Position { get; init; }
+		public float ZOffset { get; set; }
 
+		/**
+		 * <summary>
+		 * X-axis offset length. Denavit-Hartenberg parameter denoted as <c>r</c>
+		 * </summary>
+		 */
+		[Reactive]
+		public float XOffset { get; set; }
+
+		/**
+		 * <summary>
+		 * Rotation angle around z-axis. Denavit-Hartenberg parameter denoted as <c>&theta;</c>
+		 * </summary>
+		 */
+		[Reactive]
+		public float ZAngle { get; set; }
+		
+		/**
+		 * <summary>
+		 * Rotation angle around x-axis. Denavit-Hartenberg parameter denoted as <c>&alpha;</c>
+		 * </summary>
+		 */
+		[Reactive]
+		public float XAngle { get; set; }
+
+		/**
+		 * <summary>
+		 * Rotation angle around x-axis. Denavit-Hartenberg parameter denoted as <c>&alpha;</c>.
+		 * It is added to the <see cref="XAngle"/> before any movement calculation is done.
+		 * </summary>
+		 */
+		[Reactive]
+		public float Position { get; set; }
+		
 		[Reactive]
 		public float MinPositionConstraint { get; set; }
 
@@ -22,30 +60,13 @@ namespace RoboPrinter.Core.Models
 		public float MaxPositionConstraint { get; set; }
 
 		[Reactive]
-		public float? FeedbackVoltage { get; set; }
-
+		public float VoltageInstantaneous { get; set; }
+		
 		[Reactive]
-		public float? MinPositionVoltage { get; set; } // At boundary position
-
+		public float VoltageMin { get; set; }
+		
 		[Reactive]
-		public float? MaxPositionVoltage { get; set; } // At boundary position
-
-		public float? GetPositionUsingFeedback()
-		{
-			// Check if all of these properties are not null
-			if (FeedbackVoltage is { } feedbackVoltage &&
-			    MaxPositionConstraint is { } maxPositionConstraint &&
-			    MinPositionConstraint is { } minPositionConstraint)
-			{
-				float result = minPositionConstraint + // TODO check validity
-				               (feedbackVoltage / (maxPositionConstraint - minPositionConstraint) *
-				                minPositionConstraint);
-
-				return Math.Clamp(result, MinPositionConstraint, MaxPositionConstraint);
-			}
-
-			return null;
-		}
+		public float VoltageMax { get; set; }
 	}
 
 	public class ServoComparer : IEqualityComparer<Servo>

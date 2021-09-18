@@ -1,13 +1,12 @@
-﻿// unset
-
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace RoboPrinter.Avalonia.Views
 {
-	public class CalibrationControl : UserControl
+	public class PrintingControl : UserControl
 	{
-		public CalibrationControl()
+		public PrintingControl()
 		{
 			InitializeComponent();
 		}

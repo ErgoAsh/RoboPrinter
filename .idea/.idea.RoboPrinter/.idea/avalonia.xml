@@ -6,7 +6,10 @@
         <entry key="RoboPrinter.Avalonia/App.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
         <entry key="RoboPrinter.Avalonia/Views/BluetoothControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
         <entry key="RoboPrinter.Avalonia/Views/CalibrationControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/GroupBox.axaml" value="RoboPrinter.Avalonia.Tests/RoboPrinter.Avalonia.Tests.csproj" />
         <entry key="RoboPrinter.Avalonia/Views/MainWindow.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/PrintingControl.axaml" value="RoboPrinter.Avalonia.Tests/RoboPrinter.Avalonia.Tests.csproj" />
+        <entry key="RoboPrinter.Avalonia/Views/ServoCalibrationControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
         <entry key="RoboPrinter.Avalonia/Views/ServoTestControl.axaml" value="RoboPrinter.Avalonia/RoboPrinter.Avalonia.csproj" />
         <entry key="RoboPrinter.WPF/Controls/CommandControl.xaml" value="RoboPrinter.WPF/RoboPrinter.WPF.csproj" />
         <entry key="RoboPrinter.WPF/MainWindow.xaml" value="RoboPrinter.WPF/RoboPrinter.WPF.csproj" />

@@ -9,9 +9,9 @@ using System.Reactive.Disposables;
 
 namespace RoboPrinter.Avalonia.Views
 {
-	public class ServoTestControl : ReactiveUserControl<ServoTestViewModel>
+	public class ServoCalibrationControl : ReactiveUserControl<ServoTestViewModel>
 	{
-		public ServoTestControl()
+		public ServoCalibrationControl()
 		{
 			InitializeComponent();
 		}

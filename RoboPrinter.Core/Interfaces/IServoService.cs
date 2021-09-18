@@ -12,7 +12,6 @@ namespace RoboPrinter.Core.Interfaces
 	{
 		public IObservable<IChangeSet<Servo, short>> ServoCollectionChange { get; }
 		public Optional<Servo> GetServo(short id);
-		public void UpdateServo(Servo servo);
 		public void UpdateServos(IEnumerable<Servo> servos);
 
 		public void SendPositions();

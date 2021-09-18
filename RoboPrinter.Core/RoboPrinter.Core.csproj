@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="InTheHand.Net.Bluetooth" Version="4.0.20" />
     <PackageReference Include="ReactiveUI" Version="14.1.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="14.1.1" />
   </ItemGroup>

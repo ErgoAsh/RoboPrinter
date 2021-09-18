@@ -1,6 +1,4 @@
 ﻿using DynamicData;
-using InTheHand.Net;
-using InTheHand.Net.Sockets;
 using RoboPrinter.Core.Models;
 using System;
 using System.Threading;

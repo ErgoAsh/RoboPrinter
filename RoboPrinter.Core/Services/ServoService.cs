@@ -30,19 +30,10 @@ namespace RoboPrinter.Core.Models
 			return _servos.Lookup(id);
 		}
 
-		public void UpdateServo(Servo servo)
-		{
-			_servos.AddOrUpdate(servo);
-			//SendPosition(servo.Id, servo.Position);
-		}
-
 		public void UpdateServos(IEnumerable<Servo> servos)
 		{
 			_servos.AddOrUpdate(servos);
-			//foreach (Servo servo in servos)
-			//{
 			SendPositions();
-			//}
 		}
 
 		public async void SendPositions()

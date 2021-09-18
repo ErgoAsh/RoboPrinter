@@ -1,0 +1,178 @@
+﻿<reactiveUi:ReactiveUserControl xmlns="https://github.com/avaloniaui"
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                xmlns:reactiveUi="http://reactiveui.net"
+                                xmlns:viewModels="clr-namespace:RoboPrinter.Core.ViewModels;assembly=RoboPrinter.Core"
+                                xmlns:views="clr-namespace:RoboPrinter.Avalonia.Views"
+                                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                                x:Class="RoboPrinter.Avalonia.Views.ServoCalibrationControl"
+                                x:TypeArguments="viewModels:ServoTestViewModel">
+    <reactiveUi:ReactiveUserControl.Styles>
+        <Style Selector="DataGridCell.Centered">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </reactiveUi:ReactiveUserControl.Styles>
+    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,*">
+        <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                BorderThickness="1" BorderBrush="#222222">
+            <DataGrid Name="TableGrid" IsReadOnly="False" CanUserSortColumns="False"
+                      AlternatingRowBackground="#222222">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Id}"
+                                        Width="*" IsReadOnly="True"
+                                        CellStyleClasses="Centered">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    ID" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding ZOffset}"
+                                        Width="*"
+                                        CellStyleClasses="Centered">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    d" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding XOffset}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    r" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding ZAngle}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    θ" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding XAngle}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    α_0" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Width="3*">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="    α" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Name="SliderPanel"
+                                            Orientation="Vertical" VerticalAlignment="Top">
+                                    <!-- TODO add option to disable slider if currently printing -->
+                                    <Slider Minimum="30" Maximum="150"
+                                            Value="{Binding Position, Mode=TwoWay}"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Bottom"
+                                            Margin="0" Padding="0" />
+                                    <TextBlock Text="{Binding Position}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Top" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Binding="{Binding MinPositionConstraint}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    α_min" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding MaxPositionConstraint}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    α_max" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding VoltageInstantaneous}"
+                                        Width="*" IsReadOnly="True"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    V(t)" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding VoltageMin}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    V_min" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding VoltageMax}"
+                                        Width="*"
+                                        CellStyleClasses="Centered" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="    V_max" HorizontalAlignment="Center"></TextBlock>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <views:GroupBox Grid.Row="1" Grid.Column="0" Header="Data"
+                           BorderBrush="#FFFFFF" HeaderBackground="#FF00FF">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
+                        Spacing="10" Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
+                    <TextBox Name="UpdateRateTextBox"
+                             Margin="35,0,0,0" />
+                    <TextBlock Text="ms (update rate)"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0" />
+                </StackPanel>
+
+                <Button Name="UpdateButton" HorizontalAlignment="Center"
+                        HorizontalContentAlignment="Stretch">
+                    Send position update
+                </Button>
+            </StackPanel>
+        </views:GroupBox>
+
+        <Grid Grid.Row="1" Grid.Column="1"
+              RowDefinitions="*,*,*" ColumnDefinitions="*,*"
+              Margin="0,10,0,0">
+            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center">
+                Select a servo to use these buttons
+            </TextBlock>
+
+            <Button Grid.Row="1" Grid.Column="0"
+                    HorizontalAlignment="Stretch">
+                Set min position
+            </Button>
+
+            <Button Grid.Row="2" Grid.Column="0"
+                    HorizontalAlignment="Stretch">
+                Set max position
+            </Button>
+
+            <Button Grid.Row="1" Grid.Column="1"
+                    HorizontalAlignment="Stretch">
+                Go to min position
+            </Button>
+
+            <Button Grid.Row="2" Grid.Column="1"
+                    HorizontalAlignment="Stretch">
+                Go to min position
+            </Button>
+        </Grid>
+        <!-- TODO add calibration tips and procedure in TextBlocks -->
+    </Grid>
+</reactiveUi:ReactiveUserControl>

@@ -3,23 +3,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:RoboPrinter.Avalonia.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         x:Class="RoboPrinter.Avalonia.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Robo Printer"
-        CanResize="False" Height="450"
-        SystemDecorations="Full" WindowStartupLocation="CenterScreen"
-        TransparencyLevelHint="AcrylicBlur" Background="{x:Null}">
+        CanResize="False" Height="600"
+        SystemDecorations="Full" WindowStartupLocation="CenterScreen">
 
     <TabControl VerticalAlignment="Stretch">
         <TabItem Header="Bluetooth connection">
             <views:BluetoothControl />
         </TabItem>
         <TabItem Header="Servo calibration">
-            <views:CalibrationControl />
+            <views:ServoCalibrationControl />
         </TabItem>
         <TabItem Header="Servo tests">
-            <views:ServoTestControl />
+            <views:PrintingControl />
         </TabItem>
     </TabControl>
 
