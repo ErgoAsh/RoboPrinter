@@ -22,5 +22,6 @@ namespace RoboPrinter.Core.Models
 
 		[Reactive]
 		public bool IsConnected { get; set; } = false;
+
 	}
 }

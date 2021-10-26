@@ -7,6 +7,7 @@ using RoboPrinter.Core.Models;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
@@ -35,11 +36,13 @@ namespace RoboPrinter.Avalonia.Services
 		private readonly BluetoothLEAdvertisementWatcher
 			_bleAdvertisementWatcher;
 
-		private readonly Subject<string> _dataReceived;
-		private readonly Subject<string> _dataSent;
+		private readonly Subject<string> _whenDataReceived;
+		private readonly Subject<string> _whenDataSent;
+		private readonly Subject<InformationMessage> _whenInfoMessageIsChanged;
+		private readonly Subject<ConnectionState> _whenConnectionChanged;
 		private readonly SourceCache<BleServiceItem, string> _devices;
 
-		private bool _isConnected;
+		private ConnectionState _connectionState;
 
 		private GattCharacteristic? _positionCharacteristic;
 		private GattCharacteristic? _sensorCharacteristic;
@@ -47,8 +50,12 @@ namespace RoboPrinter.Avalonia.Services
 
 		public AvaloniaBluetoothService()
 		{
-			_dataSent = new Subject<string>();
-			_dataReceived = new Subject<string>();
+			_connectionState = ConnectionState.NotConnected;
+
+			_whenDataSent = new Subject<string>();
+			_whenDataReceived = new Subject<string>();
+			_whenInfoMessageIsChanged = new Subject<InformationMessage>();
+			_whenConnectionChanged = new Subject<ConnectionState>();
 			_devices = new SourceCache<BleServiceItem, string>(
 				device => device.ServerId);
 
@@ -57,57 +64,58 @@ namespace RoboPrinter.Avalonia.Services
 				ScanningMode = BluetoothLEScanningMode.Active
 			};
 
-			_bleAdvertisementWatcher.Received += async (w, btAdv) =>
-			{
-				BluetoothLEDevice? device =
-					await BluetoothLEDevice.FromBluetoothAddressAsync(
-						btAdv.BluetoothAddress);
-
-				if (device == null)
-					return;
-
-				_devices.AddOrUpdate(new BleServiceItem
-				{
-					ServerId = device.DeviceId,
-					Name = device.Name,
-					Rssi = btAdv.RawSignalStrengthInDBm,
-					ServiceUuids = device.GattServices.ToString(),
-					BluetoothAddress = device.BluetoothAddress
-				});
-			};
+			_bleAdvertisementWatcher.Received += OnBleAdvertisementWatcherReceived;
 		}
 
-		[Reactive]
-		public string ErrorStatus { get; set; } = "";
+		private async void OnBleAdvertisementWatcherReceived(BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementReceivedEventArgs btAdv)
+		{
+			BluetoothLEDevice? device = await BluetoothLEDevice.FromBluetoothAddressAsync(btAdv.BluetoothAddress);
 
-		[Reactive]
-		public bool IsScanningInProgress { get; set; }
+			if (device == null) 
+				return;
 
-		[Reactive]
-		public bool IsConnectionInProgress { get; set; }
+			if (_devices.Items.Select(item => item.BluetoothAddress)
+			    .Contains(device.BluetoothAddress))
+				return;
 
-		public IObservable<string> DataReceived => _dataReceived;
-		public IObservable<string> DataSent => _dataSent;
+			BleServiceItem newDevice = new()
+			{
+				ServerId = device.DeviceId,
+				Name = device.Name,
+				Rssi = btAdv.RawSignalStrengthInDBm,
+				ServiceUuids = device.GattServices.ToString(),
+				BluetoothAddress = device.BluetoothAddress
+			};
+
+			_devices.AddOrUpdate(newDevice);
+		}
+
+		public IObservable<string> WhenDataReceived => _whenDataReceived;
+		public IObservable<string> WhenDataSent => _whenDataSent;
+		public IObservable<InformationMessage> WhenInfoMessageChanged => _whenInfoMessageIsChanged;
+		public IObservable<ConnectionState> WhenConnectionStateChanged => _whenConnectionChanged;
 
 		public IObservable<IChangeSet<BleServiceItem, string>>
-			BluetoothDeviceCollectionChange => _devices.Connect();
+			WhenBluetoothDevicesChanged => _devices.Connect();
 
 		[Reactive]
 		public bool IsTestInProgress { get; set; }
 
 		public async void Connect(BleServiceItem? item)
 		{
-			if (item == null || _isConnected)
+			if (item == null || _connectionState == ConnectionState.Connected)
 			{
-				return; // TODO change error message
+				_whenInfoMessageIsChanged.OnNext(new InformationMessage
+				{
+					Message = "Client is already connected", 
+					MessageType = MessageType.Information
+				});
+				return;
 			}
 
-			if (IsScanningInProgress)
-			{
-				StopDeviceDiscovery();
-			}
-
-			IsConnectionInProgress = true;
+			_connectionState = ConnectionState.InProgress;
+			_whenConnectionChanged.OnNext(ConnectionState.InProgress);
+			StopDeviceDiscovery();
 
 			BluetoothLEDevice? device =
 				await BluetoothLEDevice.FromBluetoothAddressAsync(
@@ -125,14 +133,17 @@ namespace RoboPrinter.Avalonia.Services
 
 				if (characteristics == null)
 				{
-					IsConnectionInProgress = false;
+					_connectionState = ConnectionState.NotConnected;
+					_whenConnectionChanged.OnNext(ConnectionState.NotConnected);
 					return;
 				}
 
 				if (characteristics.Status != GattCommunicationStatus.Success)
 				{
-					ErrorStatus = characteristics.Status + ": " +
-					              characteristics.ProtocolError;
+					_whenInfoMessageIsChanged.OnNext(new InformationMessage {
+						MessageType = MessageType.Error, 
+						Message = characteristics.Status + ": " + characteristics.ProtocolError
+					});
 				}
 
 				_positionCharacteristic =
@@ -143,6 +154,7 @@ namespace RoboPrinter.Avalonia.Services
 					characteristics.Characteristics.Single(
 						c => c.Uuid == SensorUuid);
 
+				// TODO sensors
 				// GattCommunicationStatus status = await _sensorCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
 				// 	GattClientCharacteristicConfigurationDescriptorValue.Notify);
 				// _sensorCharacteristic.ValueChanged += (s, args) =>
@@ -160,17 +172,21 @@ namespace RoboPrinter.Avalonia.Services
 			}
 			else
 			{
-				IsConnectionInProgress = false;
+				_connectionState = ConnectionState.NotConnected;
+				_whenConnectionChanged.OnNext(ConnectionState.NotConnected);
 				return;
 			}
 
-			IsConnectionInProgress = false;
-			_isConnected = true;
+			_connectionState = ConnectionState.Connected;
+			_whenConnectionChanged.OnNext(ConnectionState.Connected);
 		}
 
 		public void Disconnect()
 		{
-			_isConnected = false;
+			// TODO If it's already connecting...
+
+			_connectionState = ConnectionState.NotConnected;
+			_whenConnectionChanged.OnNext(ConnectionState.NotConnected);
 			//_bleClient.Disconnect();
 		}
 
@@ -195,7 +211,7 @@ namespace RoboPrinter.Avalonia.Services
 				//	"Data length is invalid"));
 			}
 
-			if (_isConnected == false || _positionCharacteristic == null)
+			if (_connectionState != ConnectionState.Connected || _positionCharacteristic == null)
 			{
 				return Task.FromException(new InvalidOperationException(
 					"Connection has not been established yet"));
@@ -219,20 +235,18 @@ namespace RoboPrinter.Avalonia.Services
 
 		public void StartDeviceDiscovery()
 		{
-			ErrorStatus = "";
-			IsScanningInProgress = true;
+			//ErrorStatus = "";
 			_bleAdvertisementWatcher.Start();
 		}
 
 		public void StopDeviceDiscovery()
 		{
 			_bleAdvertisementWatcher.Stop();
-			IsScanningInProgress = false;
 		}
 
 		void IDisposable.Dispose()
 		{
-			if (_isConnected)
+			if (_connectionState == ConnectionState.Connected)
 			{
 				Disconnect();
 			}

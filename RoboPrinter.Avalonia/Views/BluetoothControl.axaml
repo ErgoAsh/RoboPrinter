@@ -9,22 +9,31 @@
                                 x:Class="RoboPrinter.Avalonia.Views.BluetoothControl">
 
     <StackPanel VerticalAlignment="Stretch" Spacing="10">
-        <DataGrid Name="ConnectionDataGrid" IsReadOnly="True" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Width="3*" Binding="{Binding ServerId}" />
-                <DataGridTextColumn Header="Name" Width="2*" Binding="{Binding Name}" />
-                <DataGridCheckBoxColumn Header="Connected" Width="*" Binding="{Binding IsConnected}" />
-            </DataGrid.Columns>
-        </DataGrid>
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Name="TestConnectionButton">Test connection</Button>
-            <Button Name="ConnectButton">Connect</Button>
-            <TextBlock Name="ErrorTextBlock"
-                       VerticalAlignment="Center"
-                       Foreground="Red" />
-            <TextBlock Name="PingTextBlock"
-                       HorizontalAlignment="Right"
-                       Margin="0,0,25,0" />
-        </StackPanel>
+		    <Border Height="500" BorderThickness="1" BorderBrush="#222222">
+				    <DataGrid Name="ConnectionDataGrid" IsReadOnly="True" SelectionMode="Single">
+						    <DataGrid.Columns>
+								    <DataGridTextColumn Header="ID" Width="3*" Binding="{Binding ServerId}" />
+								    <DataGridTextColumn Header="Name" Width="2*" Binding="{Binding Name}" />
+								    <DataGridCheckBoxColumn Header="Connected" Width="*" Binding="{Binding IsConnected}" />
+						    </DataGrid.Columns>
+				    </DataGrid>
+				</Border>
+				<Grid ColumnDefinitions="Auto,Auto,*,Auto">
+						<StackPanel Grid.Column="0">
+								<Button Name="ConnectButton">Connect</Button>
+								<Button Name="DisconnectButton">Disconnect</Button>
+						</StackPanel>
+						<Button Grid.Column="1" Name="TestConnectionButton">Test connection</Button>
+
+						<TextBlock Grid.Column="2" Name="InfoTextBlock"
+						           VerticalAlignment="Center"
+						           Foreground="Red" />
+
+						<StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
+								<TextBlock>Bluetooth search toggle</TextBlock>
+								<ToggleSwitch OffContent="Off" OnContent="On" />
+						</StackPanel>
+
+					</Grid>
     </StackPanel>
 </reactiveUi:ReactiveUserControl>

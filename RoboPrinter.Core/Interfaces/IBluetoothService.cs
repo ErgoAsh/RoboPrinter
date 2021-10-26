@@ -6,15 +6,22 @@ using System.Threading.Tasks;
 
 namespace RoboPrinter.Core.Interfaces
 {
+	public enum ConnectionState
+	{
+		NotConnected,
+		InProgress,
+		Connected
+	}
+
 	public interface IBluetoothService
 	{
-		IObservable<string> DataReceived { get; }
-		IObservable<string> DataSent { get; }
-		IObservable<IChangeSet<BleServiceItem, string>> BluetoothDeviceCollectionChange { get; }
-		bool IsTestInProgress { get; set; }
-		bool IsScanningInProgress { get; set; }
-		bool IsConnectionInProgress { get; set; }
-		
+		IObservable<string> WhenDataReceived { get; }
+		IObservable<string> WhenDataSent { get; }
+
+		IObservable<InformationMessage> WhenInfoMessageChanged { get; }
+		IObservable<ConnectionState> WhenConnectionStateChanged { get; }
+		IObservable<IChangeSet<BleServiceItem, string>> WhenBluetoothDevicesChanged { get; }
+
 		void Connect(BleServiceItem item);
 		void Disconnect();
 		void StartDeviceDiscovery();

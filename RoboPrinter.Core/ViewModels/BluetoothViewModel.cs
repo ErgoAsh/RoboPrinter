@@ -17,6 +17,7 @@ namespace RoboPrinter.Core.ViewModels
 	public class BluetoothViewModel : ReactiveObject, IActivatableViewModel
 	{
 		private readonly IBluetoothService _bluetoothService;
+		private bool _isConnected;
 
 		public BluetoothViewModel(IBluetoothService bluetoothService = null)
 		{
@@ -29,12 +30,23 @@ namespace RoboPrinter.Core.ViewModels
 
 				_bluetoothService.StartDeviceDiscovery();
 				
-				_bluetoothService.BluetoothDeviceCollectionChange
+				_bluetoothService.WhenBluetoothDevicesChanged
 					.AsObservable()
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.Bind(Items)
 					.Subscribe()
 					.DisposeWith(disposable);
+
+				_bluetoothService.WhenConnectionStateChanged
+					.Subscribe(newState => ConnectionState = newState)
+					.DisposeWith(disposable);
+
+				_bluetoothService.WhenInfoMessageChanged
+					.Subscribe(message => ConnectionError = message.Message)
+					.DisposeWith(disposable);
+
+				//this.WhenAnyValue(vm => vm._bluetoothService.IsConnectionInProgress).
+				//	.Subscribe().DisposeWith(disposable);
 			});
 
 			ConnectCommand = ReactiveCommand.Create(() =>
@@ -65,6 +77,9 @@ namespace RoboPrinter.Core.ViewModels
 		
 		[Reactive]
 		public string ConnectionError { get; set; }
+
+		[Reactive]
+		public ConnectionState ConnectionState { get; set; }
 
 		public ObservableCollectionExtended<BleServiceItem> Items { get; private set; }
 
