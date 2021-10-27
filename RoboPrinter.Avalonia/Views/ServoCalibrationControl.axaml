@@ -14,12 +14,12 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </reactiveUi:ReactiveUserControl.Styles>
-    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,*">
+    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*,Auto">
         <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                 BorderThickness="1" BorderBrush="#222222">
             <DataGrid Name="TableGrid" IsReadOnly="False" CanUserSortColumns="False"
-                      AlternatingRowBackground="#222222">
-                <DataGrid.Columns>
+                      RowHeight="80" AlternatingRowBackground="#222222">
+								<DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding Id}"
                                         Width="*" IsReadOnly="True"
                                         CellStyleClasses="Centered">
@@ -64,7 +64,7 @@
                         <DataGridTemplateColumn.Header>
                             <TextBlock Text="    α" HorizontalAlignment="Center"></TextBlock>
                         </DataGridTemplateColumn.Header>
-                        <DataGridTemplateColumn.CellTemplate>
+												<DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Name="SliderPanel"
                                             Orientation="Vertical" VerticalAlignment="Top">
@@ -125,10 +125,10 @@
             </DataGrid>
         </Border>
 
-        <views:GroupBox Grid.Row="1" Grid.Column="0" Header="Data"
-                           BorderBrush="#FFFFFF" HeaderBackground="#FF00FF">
+        <views:GroupBox Grid.Row="2" Grid.Column="0" Header="Data"
+                           BorderBrush="white" HeaderBackground="#FF00FF">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
-                        Spacing="10" Margin="0,10,0,0">
+                        Spacing="10" Margin="0,10,0,10">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
                     <TextBox Name="UpdateRateTextBox"
@@ -145,9 +145,9 @@
             </StackPanel>
         </views:GroupBox>
 
-        <Grid Grid.Row="1" Grid.Column="1"
+        <Grid Grid.Row="2" Grid.Column="1"
               RowDefinitions="*,*,*" ColumnDefinitions="*,*"
-              Margin="0,10,0,0">
+              Margin="0,10,0,10">
             <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                        HorizontalAlignment="Center">
                 Select a servo to use these buttons
