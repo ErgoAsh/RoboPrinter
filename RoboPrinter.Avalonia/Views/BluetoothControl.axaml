@@ -19,19 +19,23 @@
 				    </DataGrid>
 				</Border>
 				<Grid ColumnDefinitions="Auto,Auto,*,Auto">
-						<StackPanel Grid.Column="0">
+						<StackPanel Grid.Column="0" VerticalAlignment="Center">
 								<Button Name="ConnectButton">Connect</Button>
 								<Button Name="DisconnectButton">Disconnect</Button>
 						</StackPanel>
-						<Button Grid.Column="1" Name="TestConnectionButton">Test connection</Button>
+						<Button Grid.Column="1" Name="TestConnectionButton" 
+						        VerticalAlignment="Center"
+						        Margin="10,0,0,0">
+							Test connection
+						</Button>
 
 						<TextBlock Grid.Column="2" Name="InfoTextBlock"
 						           VerticalAlignment="Center"
-						           Foreground="Red" />
+						           Margin="10,0,0,0" />
 
 						<StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
-								<TextBlock>Bluetooth search toggle</TextBlock>
-								<ToggleSwitch OffContent="Off" OnContent="On" />
+								<TextBlock VerticalAlignment="Center">BLE device scan</TextBlock>
+								<ToggleSwitch Name="ScanToggleSwitch" OffContent="Off" OnContent="On" IsChecked="True"/>
 						</StackPanel>
 
 					</Grid>

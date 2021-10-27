@@ -108,7 +108,7 @@ namespace RoboPrinter.Avalonia.Services
 				_whenInfoMessageIsChanged.OnNext(new InformationMessage
 				{
 					Message = "Client is already connected", 
-					MessageType = MessageType.Information
+					MessageType = MessageType.Error
 				});
 				return;
 			}
@@ -123,11 +123,19 @@ namespace RoboPrinter.Avalonia.Services
 
 			GattDeviceServicesResult? gattServices =
 				await device.GetGattServicesAsync();
-			GattDeviceService? mainService = gattServices.Services
-				.Single(s => s.Uuid == ServiceUuid);
 
-			if (mainService != null)
+			try
 			{
+				GattDeviceService? mainService = gattServices.Services
+					.Single(s => s.Uuid == ServiceUuid);
+
+				if (mainService == null)
+				{
+					_connectionState = ConnectionState.NotConnected;
+					_whenConnectionChanged.OnNext(ConnectionState.NotConnected);
+					return;
+				}
+
 				GattCharacteristicsResult? characteristics =
 					await mainService.GetCharacteristicsAsync();
 
@@ -140,8 +148,9 @@ namespace RoboPrinter.Avalonia.Services
 
 				if (characteristics.Status != GattCommunicationStatus.Success)
 				{
-					_whenInfoMessageIsChanged.OnNext(new InformationMessage {
-						MessageType = MessageType.Error, 
+					_whenInfoMessageIsChanged.OnNext(new InformationMessage
+					{
+						MessageType = MessageType.Error,
 						Message = characteristics.Status + ": " + characteristics.ProtocolError
 					});
 				}
@@ -162,23 +171,27 @@ namespace RoboPrinter.Avalonia.Services
 				// 	var reader =
 				// 		DataReader.FromBuffer(args.CharacteristicValue);
 				// };
-				
+
 				_devices.AddOrUpdate(new BleServiceItem
 				{
 					ServerId = device.DeviceId,
 					Name = device.Name,
 					IsConnected = true
 				});
+
+				_connectionState = ConnectionState.Connected;
+				_whenConnectionChanged.OnNext(ConnectionState.Connected);
 			}
-			else
+			catch (InvalidOperationException e)
 			{
 				_connectionState = ConnectionState.NotConnected;
 				_whenConnectionChanged.OnNext(ConnectionState.NotConnected);
-				return;
+				_whenInfoMessageIsChanged.OnNext(new InformationMessage
+				{
+					Message = "Selected BLE device does not contain required services",
+					MessageType = MessageType.Error
+				});
 			}
-
-			_connectionState = ConnectionState.Connected;
-			_whenConnectionChanged.OnNext(ConnectionState.Connected);
 		}
 
 		public void Disconnect()

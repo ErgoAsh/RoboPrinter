@@ -8,6 +8,7 @@ using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.Models;
 using Splat;
 using System;
+using System.Drawing;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -42,7 +43,22 @@ namespace RoboPrinter.Core.ViewModels
 					.DisposeWith(disposable);
 
 				_bluetoothService.WhenInfoMessageChanged
-					.Subscribe(message => ConnectionError = message.Message)
+					.Subscribe(message =>
+					{
+						InfoMessage = message.Message;
+						switch (message.MessageType)
+						{
+							case MessageType.Error: 
+								InfoColorString = "red";
+								break;
+							case MessageType.Information:
+								InfoColorString = "white";
+								break;
+							case MessageType.Ping: 
+								InfoColorString = "gray";
+								break;
+						}
+					})
 					.DisposeWith(disposable);
 
 				//this.WhenAnyValue(vm => vm._bluetoothService.IsConnectionInProgress).
@@ -64,9 +80,17 @@ namespace RoboPrinter.Core.ViewModels
 					error =>
 					{
 						// TODO check and refactor
-						ConnectionError = error.Message;
+						InfoMessage = error.Message;
 					});
 			});
+		}
+
+		public void SetScanningMode(bool isActive)
+		{
+			if (isActive)
+				_bluetoothService.StartDeviceDiscovery();
+			else 
+				_bluetoothService.StopDeviceDiscovery();
 		}
 
 		[Reactive]
@@ -76,7 +100,10 @@ namespace RoboPrinter.Core.ViewModels
 		public long? LastPingMilliseconds { get; set; }
 		
 		[Reactive]
-		public string ConnectionError { get; set; }
+		public string InfoMessage { get; set; }
+
+		[Reactive]
+		public string InfoColorString { get; set; }
 
 		[Reactive]
 		public ConnectionState ConnectionState { get; set; }

@@ -1,12 +1,17 @@
 ﻿// unset
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using RoboPrinter.Core.Interfaces;
 using RoboPrinter.Core.ViewModels;
+using System;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace RoboPrinter.Avalonia.Views
 {
@@ -26,11 +31,14 @@ namespace RoboPrinter.Avalonia.Views
 		private Button TestConnectionButton =>
 			this.FindControl<Button>("TestConnectionButton");
 
+		private ToggleSwitch ScanToggleSwitch =>
+			this.FindControl<ToggleSwitch>("ScanToggleSwitch");
+
 		private TextBlock PingTextBlock =>
 			this.FindControl<TextBlock>("PingTextBlock");
 
-		private TextBlock ErrorTextBlock =>
-			this.FindControl<TextBlock>("ErrorTextBlock");
+		private TextBlock InfoTextBlock =>
+			this.FindControl<TextBlock>("InfoTextBlock");
 
 		private DataGrid ConnectionDataGrid =>
 			this.FindControl<DataGrid>("ConnectionDataGrid");
@@ -51,7 +59,7 @@ namespace RoboPrinter.Avalonia.Views
 				this.OneWayBind(ViewModel,
 					viewModel => viewModel.ConnectionState,
 					view => view.ConnectButton.IsVisible,
-					value => value == ConnectionState.NotConnected)
+					value => value != ConnectionState.Connected)
 					.DisposeWith(disposable);
 
 				this.OneWayBind(ViewModel, 
@@ -63,6 +71,12 @@ namespace RoboPrinter.Avalonia.Views
 				this.OneWayBind(ViewModel,
 					viewModel => viewModel.ConnectionState,
 					view => view.ConnectButton.IsEnabled,
+					value => value != ConnectionState.InProgress)
+					.DisposeWith(disposable);
+
+				this.OneWayBind(ViewModel,
+					viewModel => viewModel.ConnectionState,
+					view => view.TestConnectionButton.IsEnabled,
 					value => value != ConnectionState.InProgress)
 					.DisposeWith(disposable);
 
@@ -82,15 +96,40 @@ namespace RoboPrinter.Avalonia.Views
 					.DisposeWith(disposable);
 
 				this.OneWayBind(ViewModel,
-					viewModel => viewModel.LastPingMilliseconds,
-					view => view.PingTextBlock.Text,
-					value => value.HasValue ? $"Last ping: {value.Value}" : "")
+					viewModel => viewModel.InfoMessage,
+					view => view.InfoTextBlock.Text)
 					.DisposeWith(disposable);
 
-				this.OneWayBind(ViewModel,
-					viewModel => viewModel.ConnectionError,
-					view => view.ErrorTextBlock.Text)
-					.DisposeWith(disposable);
+				this.OneWayBind(ViewModel, 
+					viewModel => viewModel.InfoColorString,
+					view => view.InfoTextBlock.Foreground,
+					value =>
+					{
+						if (value == null)
+							return Brushes.White;
+
+						return value switch
+						{
+							"red" => Brushes.Red,
+							"gray" => Brushes.LightGray,
+							"white" => Brushes.White,
+							_ => throw new InvalidOperationException("Invalid color string"),
+						};
+					}).DisposeWith(disposable);
+
+				Observable.FromEventPattern<RoutedEventArgs>(
+					evt => ScanToggleSwitch.Checked += evt,
+					evt => ScanToggleSwitch.Checked -= evt)
+					.Subscribe(Observer.Create<EventPattern<RoutedEventArgs>>(
+						_ => ViewModel?.SetScanningMode(true)
+					)).DisposeWith(disposable);
+
+				Observable.FromEventPattern<RoutedEventArgs>(
+						evt => ScanToggleSwitch.Unchecked += evt,
+						evt => ScanToggleSwitch.Unchecked -= evt)
+					.Subscribe(Observer.Create<EventPattern<RoutedEventArgs>>(
+						_ => ViewModel?.SetScanningMode(false)
+					)).DisposeWith(disposable);
 			});
 
 			// TODO add button: open bluetooth settings
