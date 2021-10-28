@@ -18,109 +18,100 @@
         <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                 BorderThickness="1" BorderBrush="#222222">
             <DataGrid Name="TableGrid" IsReadOnly="False" CanUserSortColumns="False"
-                      RowHeight="80" AlternatingRowBackground="#222222">
+                      RowHeight="75" AlternatingRowBackground="#222222">
 								<DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Id}"
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}"
                                         Width="*" IsReadOnly="True"
                                         CellStyleClasses="Centered">
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    ID" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding ZOffset}"
+                    <DataGridTextColumn Header="d" Binding="{Binding ZOffset}"
                                         Width="*"
                                         CellStyleClasses="Centered">
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    d" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding XOffset}"
+                    <DataGridTextColumn Header="r" Binding="{Binding XOffset}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    r" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding ZAngle}"
+                    <DataGridTextColumn Header="θ" Binding="{Binding ZAngle}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    θ" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding XAngle}"
+                    <DataGridTextColumn Header="α₀" Binding="{Binding XAngle}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    α_0" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Width="3*">
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock Text="    α" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn Header="α" Width="3*">
 												<DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Name="SliderPanel"
-                                            Orientation="Vertical" VerticalAlignment="Top">
+                                <Grid Name="SliderPanel" RowDefinitions="45,*" ColumnDefinitions="*,*,*">
                                     <!-- TODO add option to disable slider if currently printing -->
-                                    <Slider Minimum="30" Maximum="150"
+                                    <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" 
+                                            Minimum="30" Maximum="150"
                                             Value="{Binding Position, Mode=TwoWay}"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Bottom"
                                             Margin="0" Padding="0" />
-                                    <TextBlock Text="{Binding Position, StringFormat={}{0:F3}}"
-                                               HorizontalAlignment="Center" FontSize="12"
-                                               VerticalAlignment="Top" />
-                                </StackPanel>
+
+                                     <Button Grid.Row="1" Grid.Column="0" 
+                                             HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                             Height="20">
+																				 <TextBlock FontSize="9">-1</TextBlock>
+                                     </Button>
+
+                                     <TextBlock Grid.Row="1" Grid.Column="1"
+																							  Text="{Binding Position, StringFormat={}{0:F3}}"
+                                                HorizontalAlignment="Center" FontSize="12"
+                                                VerticalAlignment="Top" />
+
+                                     <Button Grid.Row="1" Grid.Column="2"
+																						 HorizontalAlignment="Right" VerticalAlignment="Top" 
+																						 Height="20">
+																				 <TextBlock FontSize="9">+1</TextBlock>
+                                     </Button>
+																	</Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Binding="{Binding MinPositionConstraint}"
+                    <DataGridTextColumn Header="α min" Binding="{Binding MinPositionConstraint}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    α_min" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding MaxPositionConstraint}"
+                    <DataGridTextColumn Header="α max" Binding="{Binding MaxPositionConstraint}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    α_max" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding VoltageInstantaneous}"
-                                        Width="*" IsReadOnly="True"
-                                        CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    V(t)" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
+										<DataGridTextColumn Header="τ min" Binding="{Binding MinPulseWidth}"
+										                    Width="*"
+										                    CellStyleClasses="Centered" >
+										</DataGridTextColumn>
+
+										<DataGridTextColumn Header="τ max" Binding="{Binding MaxPulseWidth}"
+										                    Width="*"
+										                    CellStyleClasses="Centered" >
+										</DataGridTextColumn>
+
+										<DataGridTextColumn Header="V min" Binding="{Binding MinVoltage}"
+									                    Width="*"
+									                    CellStyleClasses="Centered" >
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding VoltageMin}"
+                    <DataGridTextColumn Header="V max" Binding="{Binding MaxVoltage}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    V_min" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding VoltageMax}"
-                                        Width="*"
-                                        CellStyleClasses="Centered" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="    V_max" HorizontalAlignment="Center"></TextBlock>
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
+										<DataGridTextColumn Header="V(t)" Binding="{Binding InstantaneousVoltage}"
+										                    Width="*" IsReadOnly="True"
+										                    CellStyleClasses="Centered" >
+										</DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

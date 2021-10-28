@@ -60,13 +60,19 @@ namespace RoboPrinter.Core.Models
 		public float MaxPositionConstraint { get; set; }
 
 		[Reactive]
-		public float VoltageInstantaneous { get; set; }
+		public float MinPulseWidth { get; set; }
+
+		[Reactive]
+		public float MaxPulseWidth { get; set; }
+
+		[Reactive]
+		public float MinVoltage { get; set; }
 		
 		[Reactive]
-		public float VoltageMin { get; set; }
-		
+		public float MaxVoltage { get; set; }
+
 		[Reactive]
-		public float VoltageMax { get; set; }
+		public float InstantaneousVoltage { get; set; }
 	}
 
 	public class ServoComparer : IEqualityComparer<Servo>
