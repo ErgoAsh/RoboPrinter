@@ -9,14 +9,20 @@
                                 x:Class="RoboPrinter.Avalonia.Views.BluetoothControl">
 
     <StackPanel VerticalAlignment="Stretch" Spacing="10">
-		    <Border Height="500" BorderThickness="1" BorderBrush="#222222">
-				    <DataGrid Name="ConnectionDataGrid" IsReadOnly="True" SelectionMode="Single">
+		    <Border Height="471" BorderThickness="1" BorderBrush="#222222">
+				    <DataGrid Name="ConnectionDataGrid" IsReadOnly="True" SelectionMode="Single" ColumnHeaderHeight="30">
 						    <DataGrid.Columns>
-								    <DataGridTextColumn Header="ID" Width="3*" Binding="{Binding ServerId}" />
-								    <DataGridTextColumn Header="Name" Width="2*" Binding="{Binding Name}" />
+										<DataGridTextColumn Header="Name" Width="2*" Binding="{Binding Name}"/>
+										<DataGridTextColumn Header="MAC Address" Width="2*" Binding="{Binding ServerId}" />
+										<DataGridTextColumn Header="Signal strength [dBm]" Width="2*" Binding="{Binding SignalStrength}" />
 								    <DataGridCheckBoxColumn Header="Connected" Width="*" Binding="{Binding IsConnected}" />
 						    </DataGrid.Columns>
 				    </DataGrid>
+				</Border>
+				<Border Height="30" BorderThickness="1" BorderBrush="#222222" Margin="0,-11,0,0">
+						<TextBlock Name="AddressTextBlock" FontSize="12"
+						           VerticalAlignment="Center" Margin="10,0,0,0"
+											 Foreground="#AAAAAA" />
 				</Border>
 				<Grid ColumnDefinitions="Auto,Auto,*,Auto">
 						<StackPanel Grid.Column="0" VerticalAlignment="Center">

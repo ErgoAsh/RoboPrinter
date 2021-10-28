@@ -40,6 +40,9 @@ namespace RoboPrinter.Avalonia.Views
 		private TextBlock InfoTextBlock =>
 			this.FindControl<TextBlock>("InfoTextBlock");
 
+		private TextBlock AddressTextBlock =>
+			this.FindControl<TextBlock>("AddressTextBlock");
+
 		private DataGrid ConnectionDataGrid =>
 			this.FindControl<DataGrid>("ConnectionDataGrid");
 
@@ -98,6 +101,11 @@ namespace RoboPrinter.Avalonia.Views
 				this.OneWayBind(ViewModel,
 					viewModel => viewModel.InfoMessage,
 					view => view.InfoTextBlock.Text)
+					.DisposeWith(disposable);
+
+				this.OneWayBind(ViewModel,
+					viewModel => viewModel.AppDeviceAddressString,
+					view => view.AddressTextBlock.Text)
 					.DisposeWith(disposable);
 
 				this.OneWayBind(ViewModel, 

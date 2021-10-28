@@ -15,10 +15,7 @@ namespace RoboPrinter.Core.Models
 		public string Name { get; init; }
 		
 		[Reactive]
-		public int Rssi { get; set; }
-
-		[Reactive]
-		public string ServiceUuids { get; init; }
+		public int SignalStrength { get; set; }
 
 		[Reactive]
 		public bool IsConnected { get; set; } = false;

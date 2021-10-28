@@ -43,6 +43,7 @@ namespace RoboPrinter.Avalonia.Services
 		private readonly SourceCache<BleServiceItem, string> _devices;
 
 		private ConnectionState _connectionState;
+		private string _appDeviceAddress;
 
 		private GattCharacteristic? _positionCharacteristic;
 		private GattCharacteristic? _sensorCharacteristic;
@@ -63,16 +64,22 @@ namespace RoboPrinter.Avalonia.Services
 			{
 				ScanningMode = BluetoothLEScanningMode.Active
 			};
-
 			_bleAdvertisementWatcher.Received += OnBleAdvertisementWatcherReceived;
 		}
 
 		private async void OnBleAdvertisementWatcherReceived(BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementReceivedEventArgs btAdv)
 		{
 			BluetoothLEDevice? device = await BluetoothLEDevice.FromBluetoothAddressAsync(btAdv.BluetoothAddress);
-
 			if (device == null) 
 				return;
+
+			if (string.IsNullOrWhiteSpace(_appDeviceAddress))
+			{
+				if (device.DeviceId.Contains("BluetoothLE#BluetoothLE"))
+				{
+					_appDeviceAddress = device.DeviceId.Substring(23, 17);
+				}
+			}
 
 			if (_devices.Items.Select(item => item.BluetoothAddress)
 			    .Contains(device.BluetoothAddress))
@@ -80,10 +87,9 @@ namespace RoboPrinter.Avalonia.Services
 
 			BleServiceItem newDevice = new()
 			{
-				ServerId = device.DeviceId,
+				ServerId = device.DeviceId.Split("-")[^1],
 				Name = device.Name,
-				Rssi = btAdv.RawSignalStrengthInDBm,
-				ServiceUuids = device.GattServices.ToString(),
+				SignalStrength = btAdv.RawSignalStrengthInDBm,
 				BluetoothAddress = device.BluetoothAddress
 			};
 
@@ -174,7 +180,7 @@ namespace RoboPrinter.Avalonia.Services
 
 				_devices.AddOrUpdate(new BleServiceItem
 				{
-					ServerId = device.DeviceId,
+					ServerId = device.BluetoothDeviceId.Id, //TODO add RSSI
 					Name = device.Name,
 					IsConnected = true
 				});
@@ -244,6 +250,11 @@ namespace RoboPrinter.Avalonia.Services
 				onError.Invoke(e);
 				return Task.FromException(e);
 			}
+		}
+
+		public string GetAppDeviceAddress()
+		{
+			return _appDeviceAddress;
 		}
 
 		public void StartDeviceDiscovery()

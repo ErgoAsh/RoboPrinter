@@ -35,7 +35,13 @@ namespace RoboPrinter.Core.ViewModels
 					.AsObservable()
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.Bind(Items)
-					.Subscribe()
+					.Subscribe(_ =>
+					{
+						string address =
+							_bluetoothService.GetAppDeviceAddress();
+						if (!string.IsNullOrWhiteSpace(address))
+							AppDeviceAddressString = $"Host MAC address: {address}";
+					})
 					.DisposeWith(disposable);
 
 				_bluetoothService.WhenConnectionStateChanged
@@ -104,6 +110,9 @@ namespace RoboPrinter.Core.ViewModels
 
 		[Reactive]
 		public string InfoColorString { get; set; }
+
+		[Reactive]
+		public string AppDeviceAddressString { get; set; }
 
 		[Reactive]
 		public ConnectionState ConnectionState { get; set; }

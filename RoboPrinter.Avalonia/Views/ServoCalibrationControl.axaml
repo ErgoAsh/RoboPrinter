@@ -74,8 +74,8 @@
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Bottom"
                                             Margin="0" Padding="0" />
-                                    <TextBlock Text="{Binding Position}"
-                                               HorizontalAlignment="Center"
+                                    <TextBlock Text="{Binding Position, StringFormat={}{0:F3}}"
+                                               HorizontalAlignment="Center" FontSize="12"
                                                VerticalAlignment="Top" />
                                 </StackPanel>
                             </DataTemplate>

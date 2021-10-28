@@ -22,6 +22,8 @@ namespace RoboPrinter.Core.Interfaces
 		IObservable<ConnectionState> WhenConnectionStateChanged { get; }
 		IObservable<IChangeSet<BleServiceItem, string>> WhenBluetoothDevicesChanged { get; }
 
+		string GetAppDeviceAddress();
+
 		void Connect(BleServiceItem item);
 		void Disconnect();
 		void StartDeviceDiscovery();
