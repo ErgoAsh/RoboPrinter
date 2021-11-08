@@ -73,6 +73,39 @@ namespace RoboPrinter.Core.Models
 
 		[Reactive]
 		public float InstantaneousVoltage { get; set; }
+
+		[Reactive]
+		public float InstantaneousPulseWidth { get; set; }
+
+		public void IncrementPosition()
+		{
+			Position = Math.Clamp(Position + 1, MinPositionConstraint, MaxPositionConstraint);
+		}
+
+		public void DecrementPosition()
+		{
+			Position = Math.Clamp(Position - 1, MinPositionConstraint, MaxPositionConstraint);
+		}
+
+		public float GetPulseWidth()
+		{
+			return Map(Position, 0, 180, 100, 2000);
+		}
+
+		private static float EPSILON = 1e-12F;
+		private static float Map(float value,
+			float startSource, float endSource,
+			float startTarget, float endTarget)
+		{
+			if (Math.Abs(endSource - startSource) < EPSILON)
+			{
+				throw new ArithmeticException("/ 0");
+			}
+
+			float offset = startTarget;
+			float ratio = (endTarget - startTarget) / (endSource - startSource);
+			return ratio * (value - startSource) + offset;
+		}
 	}
 
 	public class ServoComparer : IEqualityComparer<Servo>

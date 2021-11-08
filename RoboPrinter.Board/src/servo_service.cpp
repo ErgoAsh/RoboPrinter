@@ -74,5 +74,5 @@ void ServoService::set_servo_position(const short servo_number,
 
     _pwm_driver.setPWM(
         servo_number, 0,  // TODO save servo constants in servo structure
-        map(position, 0, 180, constants::servo_min, constants::servo_max));
+        map(position, 0, 180, constants::servo_us_min, constants::servo_us_max));
 }

@@ -2,41 +2,6 @@
 
 #include <Arduino.h>
 
-CustomServerCallbacks::CustomServerCallbacks(BluetoothService* service) {
-    _service = service;
-}
-
-void CustomServerCallbacks::onConnect(BLEServer* ble_server) {
-    _service->central_connected = true;
-}
-
-void CustomServerCallbacks::onDisconnect(BLEServer* ble_server) {
-    _service->central_connected = false;
-}
-
-void CustomServerCallbacks::onMtuChanged(BLEServer* pServer,
-                                         esp_ble_gatts_cb_param_t* param) {
-    Serial.print("New MTU length:");
-    Serial.print(param->mtu.mtu);
-    Serial.println();
-}
-
-CustomResponseCallbacks::CustomResponseCallbacks(ServoService* servo_service) {
-    _servo_service = servo_service;
-}
-
-void CustomResponseCallbacks::onWrite(BLECharacteristic* characteristic,
-                                      esp_ble_gatts_cb_param_t* param) {
-    auto input_data = characteristic->getValue().c_str();
-    auto length = characteristic->getValue().length();
-
-    Serial.print("Received message: ");
-    Serial.print(input_data);
-    Serial.println();
-
-    _servo_service->process_data(characteristic->getValue(), length);
-}
-
 BluetoothService::BluetoothService(ServoService* servo_service) {
     _servo_service = servo_service;
 }
@@ -45,23 +10,32 @@ void BluetoothService::initialize() {
     // Initialize BLE
     BLEDevice::init("RoboPrinter.Board");
     ble_server = BLEDevice::createServer();
-    ble_server->setCallbacks(new CustomServerCallbacks(this));
+    ble_server->setCallbacks(new BoardServerCallbacks(this));
     BLEService* ble_service =
         ble_server->createService(constants::service_uuid);
 
-    // Sensor reading characteristic
+    // Sensor reading characteristic ==========================================
     uint32_t sensor_flags =
         BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY;
     sensor_characteristic =
         ble_service->createCharacteristic(constants::sensor_uuid, sensor_flags);
     sensor_characteristic->addDescriptor(new BLE2902());
 
-    // Servo position characteristic
-    uint32_t position_flags = BLECharacteristic::PROPERTY_WRITE;
+    // Servo position characteristic ==========================================
+    uint32_t position_flags = 
+        BLECharacteristic::PROPERTY_WRITE;
     position_characteristic = ble_service->createCharacteristic(
         constants::position_uuid, position_flags);
     position_characteristic->setCallbacks(
-        new CustomResponseCallbacks(_servo_service));
+        new BoardWriteCallbacks(_servo_service));
+
+    // Latency test characteristic ============================================
+    uint32_t latency_test_flags = 
+        BLECharacteristic::PROPERTY_READ;
+    position_characteristic = ble_service->createCharacteristic(
+        constants::latency_test_uuid, latency_test_flags);
+    position_characteristic->setCallbacks(
+        new BoardWriteCallbacks(_servo_service));
 
     ble_service->start();
 

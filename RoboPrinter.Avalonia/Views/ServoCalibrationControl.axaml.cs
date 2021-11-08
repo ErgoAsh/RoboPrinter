@@ -18,8 +18,8 @@ namespace RoboPrinter.Avalonia.Views
 
 		private Button UpdateButton => this.FindControl<Button>("UpdateButton");
 
-		private CheckBox UpdateCheckBox =>
-			this.FindControl<CheckBox>("UpdateCheckBox");
+		private ToggleSwitch UpdateContinuouslySwitch =>
+			this.FindControl<ToggleSwitch>("UpdateContinuouslySwitch");
 
 		private TextBox UpdateRateTextBox =>
 			this.FindControl<TextBox>("UpdateRateTextBox");
@@ -58,7 +58,7 @@ namespace RoboPrinter.Avalonia.Views
 
 				this.Bind(ViewModel,
 					viewModel => viewModel.IsUpdatingContinuously,
-					view => view.UpdateCheckBox.IsChecked);
+					view => view.UpdateContinuouslySwitch.IsChecked);
 			});
 		}
 	}

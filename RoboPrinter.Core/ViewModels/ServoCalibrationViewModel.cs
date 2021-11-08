@@ -31,7 +31,6 @@ namespace RoboPrinter.Core.ViewModels
 			this.WhenActivated(disposable =>
 			{
 				Items = new ObservableCollectionExtended<Servo>();
-				PositionsCache = new List<KeyValuePair<short, float>>();
 
 				_servoService.ServoCollectionChange
 					.Sort(SortExpressionComparer<Servo>.Ascending(item =>
@@ -46,6 +45,11 @@ namespace RoboPrinter.Core.ViewModels
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.Subscribe(_ =>
 					{
+						foreach (Servo servo in Items)
+						{
+							servo.InstantaneousPulseWidth = servo.GetPulseWidth();
+						}
+
 						if (IsUpdatingContinuously)
 						{
 							_servoService.SendPositions();
@@ -58,6 +62,16 @@ namespace RoboPrinter.Core.ViewModels
 			{
 				_servoService.UpdateServos(Items);
 			});
+
+			IncrementCommand = ReactiveCommand.Create<short>(id =>
+			{
+				Items[id].IncrementPosition();
+			});
+
+			DecrementCommand = ReactiveCommand.Create<short>(id =>
+			{
+				Items[id].DecrementPosition();
+			});
 		}
 
 		[Reactive]
@@ -67,9 +81,10 @@ namespace RoboPrinter.Core.ViewModels
 		public int UpdateRateMilliseconds { get; set; }
 
 		public ObservableCollectionExtended<Servo> Items { get; set; }
-		public List<KeyValuePair<short, float>> PositionsCache { get; set; }
 
 		public ReactiveCommand<Unit, Unit> UpdatePositionCommand { get; }
+		public ReactiveCommand<short, Unit> IncrementCommand { get; }
+		public ReactiveCommand<short, Unit> DecrementCommand { get; }
 
 		public ViewModelActivator Activator { get; }
 	}

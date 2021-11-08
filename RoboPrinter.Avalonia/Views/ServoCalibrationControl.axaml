@@ -14,7 +14,7 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </reactiveUi:ReactiveUserControl.Styles>
-    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*,Auto">
+    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,*,Auto">
         <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                 BorderThickness="1" BorderBrush="#222222">
             <DataGrid Name="TableGrid" IsReadOnly="False" CanUserSortColumns="False"
@@ -43,6 +43,7 @@
                     <DataGridTextColumn Header="α₀" Binding="{Binding XAngle}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
+
                     </DataGridTextColumn>
 
                     <DataGridTemplateColumn Header="α" Width="3*">
@@ -51,7 +52,8 @@
                                 <Grid Name="SliderPanel" RowDefinitions="45,*" ColumnDefinitions="*,*,*">
                                     <!-- TODO add option to disable slider if currently printing -->
                                     <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" 
-                                            Minimum="30" Maximum="150"
+                                            Minimum="{Binding MinPositionConstraint}" 
+                                            Maximum="{Binding MaxPositionConstraint}"
                                             Value="{Binding Position, Mode=TwoWay}"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Bottom"
@@ -59,7 +61,10 @@
 
                                      <Button Grid.Row="1" Grid.Column="0" 
                                              HorizontalAlignment="Left" VerticalAlignment="Top" 
-                                             Height="20">
+                                             Height="22" Width="35" HorizontalContentAlignment="Center"
+                                             Command="{Binding DataContext.DecrementCommand,
+																											 RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                             CommandParameter="{Binding Id}">
 																				 <TextBlock FontSize="9">-1</TextBlock>
                                      </Button>
 
@@ -70,7 +75,10 @@
 
                                      <Button Grid.Row="1" Grid.Column="2"
 																						 HorizontalAlignment="Right" VerticalAlignment="Top" 
-																						 Height="20">
+																						 Height="22" Width="35" HorizontalContentAlignment="Center"
+																						 Command="{Binding DataContext.IncrementCommand,
+																											 RelativeSource={RelativeSource AncestorType=DataGrid}}"
+																						 CommandParameter="{Binding Id}">
 																				 <TextBlock FontSize="9">+1</TextBlock>
                                      </Button>
 																	</Grid>
@@ -98,6 +106,11 @@
 										                    CellStyleClasses="Centered" >
 										</DataGridTextColumn>
 
+										<DataGridTextColumn Header="τ(t)" Binding="{Binding InstantaneousPulseWidth}"
+										                    Width="*"
+										                    CellStyleClasses="Centered" >
+										</DataGridTextColumn>
+
 										<DataGridTextColumn Header="V min" Binding="{Binding MinVoltage}"
 									                    Width="*"
 									                    CellStyleClasses="Centered" >
@@ -116,54 +129,58 @@
             </DataGrid>
         </Border>
 
-        <views:GroupBox Grid.Row="2" Grid.Column="0" Header="Data"
-                           BorderBrush="white" HeaderBackground="#FF00FF">
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
-                        Spacing="10" Margin="0,10,0,10">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <CheckBox Name="UpdateCheckBox">Update continuously</CheckBox>
-                    <TextBox Name="UpdateRateTextBox"
-                             Margin="35,0,0,0" />
-                    <TextBlock Text="ms (update rate)"
-                               VerticalAlignment="Center"
-                               Margin="10,0,0,0" />
-                </StackPanel>
+		    <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="40"
+		            BorderThickness="1" BorderBrush="#222222" 
+		            Margin="0,-1,0,0">
+						<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
+								<TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+													 Margin="10,0,0,0">
+										Update position continuously
+								</TextBlock>
+								<ToggleSwitch Grid.Column="1" Name="UpdateContinuouslySwitch"  HorizontalAlignment="Left"
+								              OffContent="Off" OnContent="On" IsChecked="False"
+								              Margin="10,0,0,0"/>
+                            
+								<TextBox Grid.Column="2" Name="UpdateRateTextBox" HorizontalAlignment="Left"
+								         Height="30"
+								         Margin="35,0,0,0" />
+								<TextBlock Grid.Column="3" Text="ms (update rate)"
+								           VerticalAlignment="Center" HorizontalAlignment="Left"
+								           Margin="10,0,0,0"/>
 
-                <Button Name="UpdateButton" HorizontalAlignment="Center"
-                        HorizontalContentAlignment="Stretch">
-                    Send position update
-                </Button>
-            </StackPanel>
-        </views:GroupBox>
+								<Button Grid.Column="4" Name="UpdateButton" HorizontalAlignment="Right"
+								        HorizontalContentAlignment="Stretch"
+								        Margin="0,0,5,0"
+								        Height="30">
+										Send position update
+								</Button>
+						</Grid>
+		    </Border>
 
-        <Grid Grid.Row="2" Grid.Column="1"
-              RowDefinitions="*,*,*" ColumnDefinitions="*,*"
-              Margin="0,10,0,10">
-            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                       HorizontalAlignment="Center">
-                Select a servo to use these buttons
-            </TextBlock>
+		    <Grid Grid.Row="2" Grid.Column="1"
+		          RowDefinitions="*,*,*" ColumnDefinitions="*,*"
+		          Margin="0,10,0,10">
 
-            <Button Grid.Row="1" Grid.Column="0"
-                    HorizontalAlignment="Stretch">
-                Set min position
-            </Button>
+						<Button Grid.Row="1" Grid.Column="0"
+			            HorizontalAlignment="Stretch">
+					    Set min position
+				    </Button>
 
-            <Button Grid.Row="2" Grid.Column="0"
-                    HorizontalAlignment="Stretch">
-                Set max position
-            </Button>
+				    <Button Grid.Row="2" Grid.Column="0"
+				            HorizontalAlignment="Stretch">
+					    Set max position
+				    </Button>
 
-            <Button Grid.Row="1" Grid.Column="1"
-                    HorizontalAlignment="Stretch">
-                Go to min position
-            </Button>
+				    <Button Grid.Row="1" Grid.Column="1"
+				            HorizontalAlignment="Stretch">
+					    Go to min position
+				    </Button>
 
-            <Button Grid.Row="2" Grid.Column="1"
-                    HorizontalAlignment="Stretch">
-                Go to min position
-            </Button>
-        </Grid>
+				    <Button Grid.Row="2" Grid.Column="1"
+				            HorizontalAlignment="Stretch">
+					    Go to max position
+				    </Button>
+		    </Grid>
         <!-- TODO add calibration tips and procedure in TextBlocks -->
     </Grid>
 </reactiveUi:ReactiveUserControl>
