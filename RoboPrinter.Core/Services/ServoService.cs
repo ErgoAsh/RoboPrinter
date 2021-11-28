@@ -40,7 +40,7 @@ namespace RoboPrinter.Core.Models
 		{
 			// TODO check servo array length
 			var bytes = _servos.Items
-				.Select(item => item.Position)
+				.Select(item => item.InstantaneousPulseWidth)
 				.Select(item => BitConverter.GetBytes(item).Reverse())
 				.SelectMany(item => item)
 				.ToArray();
@@ -61,9 +61,10 @@ namespace RoboPrinter.Core.Models
 				_servos.AddOrUpdate(new Servo
 				{
 					Id = i,
-					Position = 90,
-					MinPositionConstraint = 60,
-					MaxPositionConstraint = 90
+					InstantaneousPulseWidth = 1500,
+					MinPulseWidth = 500,
+					MaxPulseWidth = 2500,
+					ZeroPulseWidth = 1500
 				});
 			}
 		}

@@ -43,8 +43,12 @@
                     <DataGridTextColumn Header="α₀" Binding="{Binding XAngle}"
                                         Width="*"
                                         CellStyleClasses="Centered" >
-
                     </DataGridTextColumn>
+									
+										<DataGridTextColumn Header="α(t)" Binding="{Binding InstantaneousXAngle}"
+										                    Width="*"
+										                    CellStyleClasses="Centered" >
+										</DataGridTextColumn>
 
                     <DataGridTemplateColumn Header="α" Width="3*">
 												<DataGridTemplateColumn.CellTemplate>
@@ -52,9 +56,9 @@
                                 <Grid Name="SliderPanel" RowDefinitions="45,*" ColumnDefinitions="*,*,*">
                                     <!-- TODO add option to disable slider if currently printing -->
                                     <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" 
-                                            Minimum="{Binding MinPositionConstraint}" 
-                                            Maximum="{Binding MaxPositionConstraint}"
-                                            Value="{Binding Position, Mode=TwoWay}"
+                                            Minimum="250" 
+                                            Maximum="2750"
+                                            Value="{Binding InstantaneousPulseWidth, Mode=TwoWay}"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Bottom"
                                             Margin="0" Padding="0" />
@@ -69,7 +73,7 @@
                                      </Button>
 
                                      <TextBlock Grid.Row="1" Grid.Column="1"
-																							  Text="{Binding Position, StringFormat={}{0:F3}}"
+																							  Text="{Binding InstantaneousPulseWidth, StringFormat={}{0:F3}}"
                                                 HorizontalAlignment="Center" FontSize="12"
                                                 VerticalAlignment="Top" />
 
@@ -86,27 +90,17 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="α min" Binding="{Binding MinPositionConstraint}"
-                                        Width="*"
-                                        CellStyleClasses="Centered" >
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn Header="α max" Binding="{Binding MaxPositionConstraint}"
-                                        Width="*"
-                                        CellStyleClasses="Centered" >
-                    </DataGridTextColumn>
-
 										<DataGridTextColumn Header="τ min" Binding="{Binding MinPulseWidth}"
 										                    Width="*"
 										                    CellStyleClasses="Centered" >
 										</DataGridTextColumn>
 
-										<DataGridTextColumn Header="τ max" Binding="{Binding MaxPulseWidth}"
+										<DataGridTextColumn Header="τ₀" Binding="{Binding ZeroPulseWidth}"
 										                    Width="*"
 										                    CellStyleClasses="Centered" >
 										</DataGridTextColumn>
-
-										<DataGridTextColumn Header="τ(t)" Binding="{Binding InstantaneousPulseWidth}"
+									
+										<DataGridTextColumn Header="τ max" Binding="{Binding MaxPulseWidth}"
 										                    Width="*"
 										                    CellStyleClasses="Centered" >
 										</DataGridTextColumn>

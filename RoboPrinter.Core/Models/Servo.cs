@@ -51,16 +51,13 @@ namespace RoboPrinter.Core.Models
 		 * </summary>
 		 */
 		[Reactive]
-		public float Position { get; set; }
-		
-		[Reactive]
-		public float MinPositionConstraint { get; set; }
-
-		[Reactive]
-		public float MaxPositionConstraint { get; set; }
+		public float InstantaneousXAngle { get; set; }
 
 		[Reactive]
 		public float MinPulseWidth { get; set; }
+
+		[Reactive]
+		public float ZeroPulseWidth { get; set; }
 
 		[Reactive]
 		public float MaxPulseWidth { get; set; }
@@ -79,17 +76,17 @@ namespace RoboPrinter.Core.Models
 
 		public void IncrementPosition()
 		{
-			Position = Math.Clamp(Position + 1, MinPositionConstraint, MaxPositionConstraint);
+			InstantaneousPulseWidth = Math.Clamp(InstantaneousPulseWidth + 1, 250, 2750);
 		}
 
 		public void DecrementPosition()
 		{
-			Position = Math.Clamp(Position - 1, MinPositionConstraint, MaxPositionConstraint);
+			InstantaneousPulseWidth = Math.Clamp(InstantaneousPulseWidth - 1, 250, 250);
 		}
 
-		public float GetPulseWidth()
+		public float GetInstantaneousXAngle()
 		{
-			return Map(Position, 0, 180, 100, 2000);
+			return XAngle / (ZeroPulseWidth - MinPulseWidth) * InstantaneousPulseWidth;
 		}
 
 		private static float EPSILON = 1e-12F;
@@ -118,9 +115,8 @@ namespace RoboPrinter.Core.Models
 			}
 
 			return x.Id.Equals(y.Id) &&
-			       x.Position.Equals(y.Position) &&
-			       x.MinPositionConstraint.Equals(y.MinPositionConstraint) &&
-			       x.MaxPositionConstraint.Equals(y.MaxPositionConstraint);
+			       x.InstantaneousPulseWidth.Equals(y.InstantaneousPulseWidth) &&
+			       x.InstantaneousXAngle.Equals(y.InstantaneousXAngle);
 		}
 
 		int IEqualityComparer<Servo>.GetHashCode(Servo obj)
@@ -130,7 +126,7 @@ namespace RoboPrinter.Core.Models
 				return 0;
 			}
 
-			return obj.Id.GetHashCode() + (int)obj.Position;
+			return obj.Id.GetHashCode() + (int)obj.InstantaneousPulseWidth;
 		}
 	}
 }

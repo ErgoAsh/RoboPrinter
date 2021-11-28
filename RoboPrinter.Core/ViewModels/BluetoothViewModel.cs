@@ -18,7 +18,7 @@ namespace RoboPrinter.Core.ViewModels
 	public class BluetoothViewModel : ReactiveObject, IActivatableViewModel
 	{
 		private readonly IBluetoothService _bluetoothService;
-		private bool _isConnected;
+		//private bool _isConnected;
 
 		public BluetoothViewModel(IBluetoothService bluetoothService = null)
 		{

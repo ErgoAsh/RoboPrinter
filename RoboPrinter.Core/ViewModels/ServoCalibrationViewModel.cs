@@ -47,7 +47,7 @@ namespace RoboPrinter.Core.ViewModels
 					{
 						foreach (Servo servo in Items)
 						{
-							servo.InstantaneousPulseWidth = servo.GetPulseWidth();
+							servo.InstantaneousXAngle = servo.GetInstantaneousXAngle();
 						}
 
 						if (IsUpdatingContinuously)
